@@ -1,0 +1,30 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+*.vsidx
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Oo]ut/
+
+# NuGet
+packages/
+*.nupkg
+
+# BepInEx
+BepInEx/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo

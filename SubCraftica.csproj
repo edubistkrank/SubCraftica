@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9D491F16-A0CF-4822-80E6-DFBC06DA958D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SubCraftica</RootNamespace>
+    <AssemblyName>SubCraftica</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <GameDir Condition="'$(GameDir)' == ''">C:\Juegos\Subnautica\Subnautica</GameDir>
+    <ManagedDir Condition="'$(ManagedDir)' == ''">$(GameDir)\Subnautica_Data\Managed</ManagedDir>
+    <BepInExDir Condition="'$(BepInExDir)' == ''">$(GameDir)\BepInEx\core</BepInExDir>
+    <NautilusDir Condition="'$(NautilusDir)' == ''">$(GameDir)\BepInEx\plugins\Nautilus</NautilusDir>
+    <PluginOutputDir>$(GameDir)\BepInEx\plugins\SubCraftica</PluginOutputDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(ManagedDir)\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExDir)\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(ManagedDir)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedDir)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExDir)\BepInEx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx.Harmony">
+      <HintPath>$(BepInExDir)\BepInEx.Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Nautilus">
+      <HintPath>$(NautilusDir)\Nautilus.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(ManagedDir)\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(ManagedDir)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(ManagedDir)\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(ManagedDir)\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Patches\Compat\InventoryResourceStacksCompatPatch.cs" />
+    <Compile Include="Patches\Compat\MadesRedoInventoryStackingCompatPatch.cs" />
+    <Compile Include="Patches\Compat\VisibleLockerInteriorCompatPatch.cs" />
+    <Compile Include="Patches\ConstructableConstructPatch.cs" />
+    <Compile Include="Patches\CrafterCraftDurationPatch.cs" />
+    <Compile Include="Patches\CrafterLogicIsCraftRecipeFulfilledPatch.cs" />
+    <Compile Include="Patches\CrafterLogicTryPickupSinglePatch.cs" />
+    <Compile Include="Patches\GhostCrafterCraftingBeginPatch.cs" />
+    <Compile Include="Patches\GhostCrafterCraftPatch.cs" />
+    <Compile Include="Patches\InventoryDestroyItemPatch.cs" />
+    <Compile Include="Patches\InventoryGetPickupCountPatch.cs" />
+    <Compile Include="Patches\SeamothStorageContainerAwakePatch.cs" />
+    <Compile Include="Patches\StorageContainerAwakePatch.cs" />
+    <Compile Include="Patches\TooltipFactoryCraftRecipePatch.cs" />
+    <Compile Include="Patches\TooltipFactoryWriteIngredientsPatch.cs" />
+    <Compile Include="Patches\uGUICraftingMenuActionPatch.cs" />
+    <Compile Include="Patches\uGUICraftingMenuClosePatch.cs" />
+    <Compile Include="Patches\uGUIInventoryStorageExtractionTogglePatch.cs" />
+    <Compile Include="Patches\uGUIInventoryStorageSurplusTogglePatch.cs" />
+    <Compile Include="Patches\uGUIInventoryStorageToggleShared.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="PluginInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Composition\ModServices.cs" />
+    <Compile Include="Services\Configuration\MissingIngredientColorPresets.cs" />
+    <Compile Include="Services\Configuration\ModConfig.cs" />
+    <Compile Include="Services\Configuration\StorageIngredientColorPresets.cs" />
+    <Compile Include="Services\Configuration\SubCrafticaOptions.cs" />
+    <Compile Include="Services\Crafting\CraftEnergyService.cs" />
+    <Compile Include="Services\Crafting\CraftingMathService.cs" />
+    <Compile Include="Services\Crafting\CraftingQueueService.cs" />
+    <Compile Include="Services\Crafting\CraftingRequest.cs" />
+    <Compile Include="Services\Crafting\CraftingTimeControllerService.cs" />
+    <Compile Include="Services\Crafting\CraftPlanResult.cs" />
+    <Compile Include="Services\Crafting\CraftQueueCoordinatorService.cs" />
+    <Compile Include="Services\Crafting\CraftRuntimeState.cs" />
+    <Compile Include="Services\Crafting\CraftRuntimeTrackerService.cs" />
+    <Compile Include="Services\Crafting\CraftSynchronizationService.cs" />
+    <Compile Include="Services\Crafting\PlannerValidationService.cs" />
+    <Compile Include="Services\Crafting\QuantitySelectionService.cs" />
+    <Compile Include="Services\Crafting\QueueFeedbackService.cs" />
+    <Compile Include="Services\Crafting\RecipeDataOverrideService.cs" />
+    <Compile Include="Services\Crafting\RecipePlannerService.cs" />
+    <Compile Include="Services\Localization\ModText.cs" />
+    <Compile Include="Services\Resources\NearbyStorageService.cs" />
+    <Compile Include="Services\Resources\StoragePreferredSurplusService.cs" />
+    <Compile Include="Services\Resources\StackingCountService.cs" />
+    <Compile Include="Services\Resources\StorageCompatLogger.cs" />
+    <Compile Include="Services\Resources\StorageExtractionExclusionService.cs" />
+    <Compile Include="Services\Resources\StorageIdentifierResolver.cs" />
+    <Compile Include="Services\Stacking\StackingBackend.cs" />
+    <Compile Include="Services\Stacking\StackingDetectionService.cs" />
+    <Compile Include="Services\UI\ColorHexUtility.cs" />
+    <Compile Include="Services\UI\RecipeCraftabilityResolver.cs" />
+    <Compile Include="Services\UI\RecipeOwnedIngredientsTooltipService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="CopyToGamePlugins" AfterTargets="Build">
+    <MakeDir Directories="$(PluginOutputDir)" />
+    <MakeDir Directories="$(PluginOutputDir)\lang" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(PluginOutputDir)\$(AssemblyName).dll" OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="@(LangFiles)" DestinationFolder="$(PluginOutputDir)\lang" OverwriteReadOnlyFiles="true" />
+  </Target>
+  <ItemGroup>
+    <Content Include="lang\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <LangFiles Include="lang\*.json" />
+  </ItemGroup>
+</Project>
