@@ -4,7 +4,7 @@ You wake up in the middle of the ocean, your fabricator is hungry, your lockers 
 
 So... I built **SubCraftica** to make crafting feel less like wrestling a Reaper and more like actually surviving with style. 🐟
 
-🌊 **WHAT IS SUBCRAFTICA?**
+## 🌊 **WHAT IS SUBCRAFTICA?**
 
 SubCraftica is a quality-of-life crafting mod for Subnautica that helps you:
 
@@ -16,7 +16,7 @@ SubCraftica is a quality-of-life crafting mod for Subnautica that helps you:
 
 It keeps a **vanilla-first behavior** in core crafting flow, so things feel natural and stable.
 
-🧰 **MAIN FEATURES**
+## 🧰 **MAIN FEATURES**
 
 ### 1) Auto-crafting sub-recipes
 If a recipe needs components that can also be crafted, SubCraftica can chain that process for you.
@@ -42,7 +42,7 @@ Each storage can be marked with extra behavior:
 - **Exclude from extraction**
 - **Prefer for surplus return**
 
-🔍 **TOOLTIP GUIDE (what the numbers and colors mean)**
+## 🔍 **TOOLTIP GUIDE (what the numbers and colors mean)**
 
 ### Amounts / counts
 - You may see ingredient counts in formats like `owned / required`.
@@ -60,7 +60,7 @@ Each storage can be marked with extra behavior:
 The tooltip is there to answer one question quickly:
 > “Can I craft this now, and if not, what exactly is missing?”
 
-⚙️ **CONFIG OPTIONS (simple map)**
+## ⚙️ **CONFIG OPTIONS (simple map)**
 
 - **Crafting Mode**: Per-item / Batch / Instant
 - **Max Units Per Request**: queue cap
@@ -72,11 +72,11 @@ The tooltip is there to answer one question quickly:
 - **Tooltip Mode**: Disabled / Basic / Advanced
 - **Ingredient Color Presets**: visual style preferences
 
-🌍 **LOCALIZATION**
+## 🌍 **LOCALIZATION**
 
 SubCraftica ships with 27 language files in `lang/`.
 
-📦 **REQUIREMENTS**
+## 📦 **REQUIREMENTS**
 
 - Subnautica
 - BepInEx
@@ -87,7 +87,7 @@ Optional compatibility mods:
 - Inventory Resource Stacks
 - Visible Locker Interior (Fix for visual issues in storage interactions)
 
-🧩 **COMPATIBILITY NOTES**
+## 🧩 **COMPATIBILITY NOTES**
 
 Designed to work with common stacking mods and vanilla-first crafting flow.
 
@@ -98,7 +98,7 @@ Optional compatibility mods:
 
 **Final note:** SubCraftica may be incompatible with any other mod that modifies the same crafting queue, tooltip, storage extraction, or autocrafting flow internals.
 
-🛠️ **INSTALLATION**
+##🛠️ **INSTALLATION**
 
 1. Install **BepInEx** and **Nautilus**.
 2. Copy `SubCraftica.dll` to:
@@ -107,7 +107,7 @@ Optional compatibility mods:
    - `BepInEx/plugins/SubCraftica/lang/`
 4. Launch the game and configure SubCraftica in the mods/options menu.
 
-💙 **THANKS / INSPIRATION**
+## 💙 **THANKS / INSPIRATION**
 
 Huge thanks to the modding ecosystem and authors whose work inspired this project and pushed me to keep improving:
 
@@ -120,9 +120,7 @@ Huge thanks to the modding ecosystem and authors whose work inspired this projec
 - **VisibleLockerInterior** and other QoL mod creators
 - Players who report bugs with patience and useful logs 💙
 
----
-
-🫧 **Final personal note (from the pirate of this tiny lifepod)**
+## 🫧 **Final personal note (from the pirate of this tiny lifepod)**
 
 I’m not a professional programmer — just someone stubborn enough to keep debugging until 3 AM because “one more test and I sleep” (spoiler: I don’t).
 This mod took a lot of time, effort, and love. I’ll keep trying to help, fix, and improve it as much as possible.
@@ -132,7 +130,7 @@ If something breaks, tell me. If something works, also tell me (my morale is pow
 And yes, real life economy is currently doing a perfect impression of a damaged Seamoth hull 😅
 So if you want to support the project, I’ll leave my link here:
 
-**[Put your support link here]**
+**[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/0ctop3dus)**
 
 No pressure at all — enjoying the mod already means a lot.
 
