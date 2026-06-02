@@ -5,11 +5,15 @@ namespace SubCraftica.Services.Crafting;
 
 internal sealed class QuantitySelectionService
 {
+    private const float ControllerInitialRepeatDelay = 0.28f;
+    private const float ControllerRepeatInterval = 0.12f;
+
     private readonly ModConfig config;
     private readonly RecipePlannerService planner;
 
     private TechType currentTechType = TechType.None;
     private int currentAmount = 1;
+    private float nextControllerAdjustAt;
 
     public QuantitySelectionService(ModConfig config, RecipePlannerService planner)
     {
@@ -23,6 +27,7 @@ internal sealed class QuantitySelectionService
         {
             currentTechType = techType;
             currentAmount = 1;
+            nextControllerAdjustAt = 0f;
         }
 
         return currentAmount;
@@ -34,6 +39,7 @@ internal sealed class QuantitySelectionService
         {
             currentTechType = techType;
             currentAmount = 1;
+            nextControllerAdjustAt = 0f;
         }
 
         var scrollDelta = Input.mouseScrollDelta.y;
@@ -46,7 +52,51 @@ internal sealed class QuantitySelectionService
             currentAmount = Mathf.Max(1, currentAmount - 1);
         }
 
+        HandleControllerAdjust(techType);
+
         return currentAmount;
+    }
+
+    private void HandleControllerAdjust(TechType techType)
+    {
+        if (!GameInput.IsPrimaryDeviceGamepad())
+        {
+            nextControllerAdjustAt = 0f;
+            return;
+        }
+
+        if (TryConsumeControllerAdjust(GameInput.Button.UIAdjustRight, GameInput.Button.UIRight))
+        {
+            TryIncrease(techType);
+            return;
+        }
+
+        if (TryConsumeControllerAdjust(GameInput.Button.UIAdjustLeft, GameInput.Button.UILeft))
+        {
+            currentAmount = Mathf.Max(1, currentAmount - 1);
+        }
+    }
+
+    private bool TryConsumeControllerAdjust(GameInput.Button primaryButton, GameInput.Button secondaryButton)
+    {
+        if (GameInput.GetButtonDown(primaryButton) || GameInput.GetButtonDown(secondaryButton))
+        {
+            nextControllerAdjustAt = Time.unscaledTime + ControllerInitialRepeatDelay;
+            return true;
+        }
+
+        if (Time.unscaledTime < nextControllerAdjustAt)
+        {
+            return false;
+        }
+
+        if (GameInput.GetButtonHeld(primaryButton) || GameInput.GetButtonHeld(secondaryButton))
+        {
+            nextControllerAdjustAt = Time.unscaledTime + ControllerRepeatInterval;
+            return true;
+        }
+
+        return false;
     }
 
     private void TryIncrease(TechType techType)

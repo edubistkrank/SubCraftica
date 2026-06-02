@@ -98,12 +98,23 @@ internal static class uGUIInventoryStorageToggleShared
         toggle.transition = Selectable.Transition.ColorTint;
         toggle.targetGraphic = fillImage;
         toggle.graphic = checkImage;
+        toggle.navigation = BuildToggleNavigation();
 
         ApplyVisualStyle(root.transform);
 
         toggle.onValueChanged.AddListener(handler);
 
         EnsureLabel(labelTransform, labelObjectName, labelText, anchoredPosition);
+    }
+
+    private static Navigation BuildToggleNavigation()
+    {
+        var navigation = new Navigation
+        {
+            mode = Navigation.Mode.Automatic
+        };
+
+        return navigation;
     }
 
     internal static bool TryPrepareToggleState(object tab, string toggleObjectName, string labelObjectName, out Toggle toggle, out string storageId)
@@ -119,7 +130,30 @@ internal static class uGUIInventoryStorageToggleShared
 
         var hasStorage = TryResolveActiveStorageId(out storageId);
         SetVisibility(tab, toggleObjectName, labelObjectName, hasStorage);
+
+        if (hasStorage)
+        {
+            EnsureSelectableFriendly(toggle);
+        }
+
         return hasStorage;
+    }
+
+    private static void EnsureSelectableFriendly(Toggle toggle)
+    {
+        if (toggle == null || toggle.gameObject == null)
+        {
+            return;
+        }
+
+        toggle.interactable = true;
+        toggle.enabled = true;
+
+        var selectable = toggle as Selectable;
+        if (selectable != null)
+        {
+            selectable.navigation = BuildToggleNavigation();
+        }
     }
 
     internal static Toggle FindToggle(object tab, string toggleObjectName)

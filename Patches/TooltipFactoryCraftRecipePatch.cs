@@ -115,19 +115,8 @@ internal static class TooltipFactoryCraftRecipePatch
         var scrollDownIcon = GetScrollDownIcon();
         var adjustText = ModText.Get(ModText.Tooltip_AdjustAmount);
 
-        string adjustLine;
-        if (!string.IsNullOrEmpty(scrollUpIcon) && !string.IsNullOrEmpty(scrollDownIcon))
-        {
-            adjustLine = string.IsNullOrEmpty(icon)
-                ? $"<size=20><color=#00ffffff>{adjustText} ({scrollUpIcon} / {scrollDownIcon})</color></size>"
-                : $"<size=20>{icon} - <color=#00ffffff>{adjustText} ({scrollUpIcon} / {scrollDownIcon})</color></size>";
-        }
-        else
-        {
-            adjustLine = string.IsNullOrEmpty(icon)
-                ? $"<size=20><color=#00ffffff>{adjustText}</color></size>"
-                : $"<size=20>{icon} - <color=#00ffffff>{adjustText}</color></size>";
-        }
+        var isGamepad = GameInput.IsPrimaryDeviceGamepad();
+        var adjustLine = BuildAdjustLine(adjustText, isGamepad, icon, scrollUpIcon, scrollDownIcon);
 
         var label = ModText.Get(ModText.Tooltip_Amount);
         var craftAmount = TechData.GetCraftAmount(techType);
@@ -147,6 +136,48 @@ internal static class TooltipFactoryCraftRecipePatch
 
         data.postfix.AppendLine($"\n{adjustLine}");
         data.postfix.AppendLine($"\n{amountLine}");
+    }
+
+    private static string BuildAdjustLine(string adjustText, bool isGamepad, string mouseMiddleIcon, string scrollUpIcon, string scrollDownIcon)
+    {
+        if (isGamepad)
+        {
+            var left = GameInput.FormatButton(GameInput.Button.UIAdjustLeft, false);
+            var right = GameInput.FormatButton(GameInput.Button.UIAdjustRight, false);
+            if (string.IsNullOrWhiteSpace(left) && string.IsNullOrWhiteSpace(right))
+            {
+                left = GameInput.FormatButton(GameInput.Button.UILeft, false);
+                right = GameInput.FormatButton(GameInput.Button.UIRight, false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(left) && !string.IsNullOrWhiteSpace(right))
+            {
+                return $"<size=20><color=#00ffffff>{adjustText} ({left} / {right})</color></size>";
+            }
+
+            if (!string.IsNullOrWhiteSpace(left))
+            {
+                return $"<size=20><color=#00ffffff>{adjustText} ({left})</color></size>";
+            }
+
+            if (!string.IsNullOrWhiteSpace(right))
+            {
+                return $"<size=20><color=#00ffffff>{adjustText} ({right})</color></size>";
+            }
+
+            return $"<size=20><color=#00ffffff>{adjustText}</color></size>";
+        }
+
+        if (!string.IsNullOrEmpty(scrollUpIcon) && !string.IsNullOrEmpty(scrollDownIcon))
+        {
+            return string.IsNullOrEmpty(mouseMiddleIcon)
+                ? $"<size=20><color=#00ffffff>{adjustText} ({scrollUpIcon} / {scrollDownIcon})</color></size>"
+                : $"<size=20>{mouseMiddleIcon} - <color=#00ffffff>{adjustText} ({scrollUpIcon} / {scrollDownIcon})</color></size>";
+        }
+
+        return string.IsNullOrEmpty(mouseMiddleIcon)
+            ? $"<size=20><color=#00ffffff>{adjustText}</color></size>"
+            : $"<size=20>{mouseMiddleIcon} - <color=#00ffffff>{adjustText}</color></size>";
     }
 }
 
