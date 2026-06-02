@@ -46,6 +46,7 @@ namespace SubCraftica.Patches
             var count = ingredients.Count;
             var main = Inventory.main;
             var sb = new StringBuilder();
+            var creativeMode = Plugin.Services.Config.CreativeMode.Value;
 
             for (var i = 0; i < count; i++)
             {
@@ -70,10 +71,7 @@ namespace SubCraftica.Patches
                     pickupCount = main.GetPickupCount(techType);
                 }
 
-                var inventoryEnough = pickupCount >= amount || !GameModeUtils.RequiresIngredients();
-                var sprite = SpriteManager.Get(techType);
-
-                if (inventoryEnough)
+                if (creativeMode)
                 {
                     var invColors = StorageIngredientColorPresets.Colors;
                     var invIdx = Plugin.Services.Config.InventoryIngredientColorPreset.Value;
@@ -85,26 +83,40 @@ namespace SubCraftica.Patches
                 }
                 else
                 {
-                    var storageCount = Plugin.Services.NearbyStorage.GetNearbyCount(techType, playerContainer);
-                    if (pickupCount + storageCount >= amount)
+                    var inventoryEnough = pickupCount >= amount || !GameModeUtils.RequiresIngredients();
+                    if (inventoryEnough)
                     {
-                        var storColors = StorageIngredientColorPresets.Colors;
-                        var storIdx = Plugin.Services.Config.StorageOnlyIngredientColorPreset.Value;
-                        if (storIdx < 0 || storIdx >= storColors.Length)
-                            storIdx = 0;
+                        var invColors = StorageIngredientColorPresets.Colors;
+                        var invIdx = Plugin.Services.Config.InventoryIngredientColorPreset.Value;
+                        if (invIdx < 0 || invIdx >= invColors.Length)
+                            invIdx = 0;
                         sb.Append("<color=#");
-                        sb.Append(ColorHexUtility.ToHex(storColors[storIdx]));
+                        sb.Append(ColorHexUtility.ToHex(invColors[invIdx]));
                         sb.Append(">");
                     }
                     else
                     {
-                        var misColors = MissingIngredientColorPresets.Colors;
-                        var misIdx = Plugin.Services.Config.MissingIngredientColorPreset.Value;
-                        if (misIdx < 0 || misIdx >= misColors.Length)
-                            misIdx = 0;
-                        sb.Append("<color=#");
-                        sb.Append(ColorHexUtility.ToHex(misColors[misIdx]));
-                        sb.Append(">");
+                        var storageCount = Plugin.Services.NearbyStorage.GetNearbyCount(techType, playerContainer);
+                        if (pickupCount + storageCount >= amount)
+                        {
+                            var storColors = StorageIngredientColorPresets.Colors;
+                            var storIdx = Plugin.Services.Config.StorageOnlyIngredientColorPreset.Value;
+                            if (storIdx < 0 || storIdx >= storColors.Length)
+                                storIdx = 0;
+                            sb.Append("<color=#");
+                            sb.Append(ColorHexUtility.ToHex(storColors[storIdx]));
+                            sb.Append(">");
+                        }
+                        else
+                        {
+                            var misColors = MissingIngredientColorPresets.Colors;
+                            var misIdx = Plugin.Services.Config.MissingIngredientColorPreset.Value;
+                            if (misIdx < 0 || misIdx >= misColors.Length)
+                                misIdx = 0;
+                            sb.Append("<color=#");
+                            sb.Append(ColorHexUtility.ToHex(misColors[misIdx]));
+                            sb.Append(">");
+                        }
                     }
                 }
 
@@ -120,7 +132,7 @@ namespace SubCraftica.Patches
                 }
 
                 sb.Append("</color>");
-                icons.Add(new TooltipIcon(sprite, sb.ToString()));
+                icons.Add(new TooltipIcon(SpriteManager.Get(techType), sb.ToString()));
             }
 
             return false;

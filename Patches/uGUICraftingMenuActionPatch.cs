@@ -39,11 +39,14 @@ internal static class uGUICraftingMenuActionPatch
             return true;
         }
 
-        var plan = Plugin.Services.RecipePlanner.BuildRequestPlan(techType, request.Amount);
-        if (!plan.Success)
+        if (!Plugin.Services.Config.CreativeMode.Value)
         {
-            ErrorMessage.AddWarning(Language.main.Get("DontHaveNeededIngredients"));
-            return false;
+            var plan = Plugin.Services.RecipePlanner.BuildRequestPlan(techType, request.Amount);
+            if (!plan.Success)
+            {
+                ErrorMessage.AddWarning(Language.main.Get("DontHaveNeededIngredients"));
+                return false;
+            }
         }
 
         var queued = Plugin.Services.Queue.TryEnqueue(request, Plugin.Services.Config.MaxQueueSize.Value);

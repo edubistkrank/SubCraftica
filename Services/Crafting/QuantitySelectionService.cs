@@ -108,6 +108,13 @@ internal sealed class QuantitySelectionService
         }
 
         var candidate = currentAmount + 1;
+
+        if (config.CreativeMode.Value)
+        {
+            currentAmount = candidate;
+            return;
+        }
+
         var plan = planner.BuildRequestPlan(techType, candidate);
         if (plan.Success)
         {

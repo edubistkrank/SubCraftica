@@ -23,6 +23,12 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
+        if (Plugin.Services.Config.CreativeMode.Value && IsCraftOrConstructContextActive())
+        {
+            __result = true;
+            return;
+        }
+
         if (!GameModeUtils.RequiresIngredients())
         {
             return;
@@ -68,6 +74,16 @@ internal static class InventoryDestroyItemPatch
         }
 
         TryShowConstructWarning();
+    }
+
+    private static bool IsCraftOrConstructContextActive()
+    {
+        if (ConstructableConstructPatchContext.IsActive)
+        {
+            return true;
+        }
+
+        return Plugin.Services != null && Plugin.Services.Synchronization.IsCraftInProgress;
     }
 
     internal static void FlushConstructSurplus()

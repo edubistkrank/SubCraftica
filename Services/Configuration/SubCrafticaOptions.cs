@@ -16,6 +16,7 @@ internal sealed class SubCrafticaOptions : ModOptions
     private const string SectionColorsId = "SubCraftica.Section.Colors";
 
     private const string OptionEnableAutoSubcraftId = nameof(ModText.Opt_EnableAutoSubcraft);
+    private const string OptionCreativeModeId = nameof(ModText.Opt_CreativeMode);
     private const string OptionCraftingTooltipModeId = nameof(ModText.Opt_CraftingTooltipMode);
     private const string OptionResetToDefaultsId = nameof(ModText.Opt_ResetToDefaults);
     private const string OptionCraftingModeId = nameof(ModText.Opt_CraftingMode);
@@ -58,6 +59,12 @@ internal sealed class SubCrafticaOptions : ModOptions
             OptionEnableAutoSubcraftId,
             ModText.Get(ModText.Opt_EnableAutoSubcraft),
             ModText.Get(ModText.OptDesc_EnableAutoSubcraft));
+
+        AddToggle(
+            config.CreativeMode,
+            OptionCreativeModeId,
+            ModText.Get(ModText.Opt_CreativeMode),
+            ModText.Get(ModText.OptDesc_CreativeMode));
 
         AddCraftingTooltipModeChoice(
             config.CraftingTooltipMode,
@@ -217,6 +224,7 @@ internal sealed class SubCrafticaOptions : ModOptions
         }
 
         config.EnableAutoSubcraft.Value = true;
+        config.CreativeMode.Value = false;
         config.CraftingTooltipMode.Value = ModConfig.CraftingTooltipModeAdvanced;
         config.StorageCraftMode.Value = ModConfig.StorageModeNearby;
         config.StorageRange.Value = 100f;
@@ -237,6 +245,7 @@ internal sealed class SubCrafticaOptions : ModOptions
     private void RefreshControlsFromConfig()
     {
         SetToggleValue(OptionEnableAutoSubcraftId, config.EnableAutoSubcraft.Value);
+        SetToggleValue(OptionCreativeModeId, config.CreativeMode.Value);
         SetChoiceValue(OptionCraftingTooltipModeId, config.CraftingTooltipMode.Value);
         SetChoiceValue(OptionCraftingModeId, config.CraftingMode.Value);
         SetSliderValue(OptionMaxUnitsPerRequestId, config.MaxQueueSize.Value);

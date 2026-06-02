@@ -62,5 +62,7 @@
   "SubCraftica.CraftingTooltipMode_Advanced": "Pokročilé",
   "SubCraftica.Tooltip_AdjustAmount": "Upravte množstvo",
   "SubCraftica.Tooltip_Amount": "Vyrobiť",
-  "SubCraftica.Tooltip_Total": "Celkom"
+  "SubCraftica.Tooltip_Total": "Celkom",
+  "SubCraftica.Opt_CreativeMode": "Creative mode",
+  "SubCraftica.OptDesc_CreativeMode": "Allows crafting without consuming ingredients in any crafter, fabricator, or similar crafting device. Inventory and storages are ignored for ingredient requirements. Warning: this can break the intended game experience."
 }

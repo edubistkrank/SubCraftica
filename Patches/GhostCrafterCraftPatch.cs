@@ -65,6 +65,21 @@ internal static class GhostCrafterCraftPatch
         Services.QueueFeedback.NotifyCraftProgress(techType, crafted, totalAmount);
 
         var powerRelay = Traverse.Create(instance).Field<PowerRelay>("powerRelay").Value;
+
+        if (Services.Config.CreativeMode.Value)
+        {
+            var requiredEnergyCreative = Services.Energy.GetRequiredEnergy(techType, 1);
+            if (!Services.Energy.HasEnoughEnergy(powerRelay, techType, requiredEnergyCreative))
+            {
+                HandleNotEnoughPowerFailure(techType, ModConfig.CraftingModePerItem);
+                return false;
+            }
+
+            Services.RecipeOverride.ApplyAmountOverride(techType, 1);
+            Services.CraftRuntimeState.SetRequiredEnergy(techType, requiredEnergyCreative);
+            return true;
+        }
+
         var plan = Services.RecipePlanner.BuildPlan(techType, 1);
         if (!plan.Success)
         {
@@ -99,6 +114,18 @@ internal static class GhostCrafterCraftPatch
 
         while (craftAmount > 0)
         {
+            if (Services.Config.CreativeMode.Value)
+            {
+                requiredEnergy = Services.Energy.GetRequiredEnergy(techType, craftAmount);
+                if (Services.Energy.HasEnoughEnergy(powerRelay, techType, requiredEnergy))
+                {
+                    break;
+                }
+
+                craftAmount--;
+                continue;
+            }
+
             plan = Services.RecipePlanner.BuildPlan(techType, craftAmount);
             if (!plan.Success)
             {
@@ -115,7 +142,7 @@ internal static class GhostCrafterCraftPatch
             craftAmount--;
         }
 
-        if (craftAmount <= 0 || plan == null || !plan.Success)
+        if (craftAmount <= 0 || (!Services.Config.CreativeMode.Value && (plan == null || !plan.Success)))
         {
             if (failedOnIngredients)
             {

@@ -8,7 +8,18 @@ internal static class CrafterLogicIsCraftRecipeFulfilledPatch
     [HarmonyPostfix]
     private static void Postfix(TechType techType, ref bool __result)
     {
-        if (__result || Plugin.Services == null)
+        if (Plugin.Services == null)
+        {
+            return;
+        }
+
+        if (Plugin.Services.Config.CreativeMode.Value)
+        {
+            __result = Plugin.Services.PlannerValidation.CanPlan(techType);
+            return;
+        }
+
+        if (__result)
         {
             return;
         }

@@ -24,6 +24,7 @@ internal sealed class ModConfig
     public const int CraftingTooltipModeAdvanced = 2;
 
     public ConfigEntry<bool> EnableAutoSubcraft { get; private set; }
+    public ConfigEntry<bool> CreativeMode { get; private set; }
     public ConfigEntry<int> CraftingTooltipMode { get; private set; }
     public ConfigEntry<int> StorageCraftMode { get; private set; }
     public ConfigEntry<float> StorageRange { get; private set; }
@@ -45,6 +46,7 @@ internal sealed class ModConfig
         var result = new ModConfig
         {
             EnableAutoSubcraft = config.Bind("General", "EnableAutoSubcraft", true, ModText.Get(ModText.OptDesc_EnableAutoSubcraft)),
+            CreativeMode = config.Bind("General", "CreativeMode", false, ModText.Get(ModText.OptDesc_CreativeMode)),
             CraftingTooltipMode = config.Bind("General", "CraftingTooltipMode", CraftingTooltipModeAdvanced, ModText.Get(ModText.OptDesc_CraftingTooltipMode)),
             StorageCraftMode = config.Bind("General", "StorageCraftMode", StorageModeNearby, ModText.Get(ModText.OptDesc_StorageMode)),
             StorageRange = config.Bind("General", "StorageRange", 100f, ModText.Get(ModText.OptDesc_StorageRange)),

@@ -62,5 +62,7 @@
   "SubCraftica.CraftingTooltipMode_Advanced": "Avancerad",
   "SubCraftica.Tooltip_AdjustAmount": "Justera mängd",
   "SubCraftica.Tooltip_Amount": "Tillverka",
-  "SubCraftica.Tooltip_Total": "Totalt"
+  "SubCraftica.Tooltip_Total": "Totalt",
+  "SubCraftica.Opt_CreativeMode": "Creative mode",
+  "SubCraftica.OptDesc_CreativeMode": "Allows crafting without consuming ingredients in any crafter, fabricator, or similar crafting device. Inventory and storages are ignored for ingredient requirements. Warning: this can break the intended game experience."
 }

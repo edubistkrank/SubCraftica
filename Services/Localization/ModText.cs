@@ -26,6 +26,7 @@ internal static class ModText
     public const string ToggleLabelExclude = "SubCraftica.ToggleLabelExclude";
     public const string ToggleLabelPrefer = "SubCraftica.ToggleLabelPrefer";
     public const string Opt_EnableAutoSubcraft = "SubCraftica.Opt_EnableAutoSubcraft";
+    public const string Opt_CreativeMode = "SubCraftica.Opt_CreativeMode";
     public const string Opt_CraftingTooltipMode = "SubCraftica.Opt_CraftingTooltipMode";
     public const string Opt_StorageMode = "SubCraftica.Opt_StorageMode";
     public const string Opt_StorageRange = "SubCraftica.Opt_StorageRange";
@@ -45,6 +46,7 @@ internal static class ModText
     public const string OptGroup_Energy = "SubCraftica.OptGroup_Energy";
     public const string OptGroup_Colors = "SubCraftica.OptGroup_Colors";
     public const string OptDesc_EnableAutoSubcraft = "SubCraftica.OptDesc_EnableAutoSubcraft";
+    public const string OptDesc_CreativeMode = "SubCraftica.OptDesc_CreativeMode";
     public const string OptDesc_CraftingTooltipMode = "SubCraftica.OptDesc_CraftingTooltipMode";
     public const string OptDesc_StorageMode = "SubCraftica.OptDesc_StorageMode";
     public const string OptDesc_StorageRange = "SubCraftica.OptDesc_StorageRange";

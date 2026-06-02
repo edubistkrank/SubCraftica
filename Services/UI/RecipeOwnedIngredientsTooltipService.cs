@@ -741,13 +741,26 @@ internal static class RecipeOwnedIngredientsTooltipService
         var playerCount = RecipeCraftabilityResolver.GetPlayerCount(node.TechType, playerContainer);
         var storageCount = RecipeCraftabilityResolver.GetStorageCount(node.TechType, playerContainer);
         var total = playerCount + storageCount;
-        var color = ResolveOwnedColorHex(node.Required, playerCount, storageCount, node.CraftableBySubingredients, node.CraftFromStorage);
+        var creativeMode = Plugin.Services?.Config != null && Plugin.Services.Config.CreativeMode.Value;
+        var color = creativeMode
+            ? GetPresetColorHex(StorageIngredientColorPresets.Colors, Plugin.Services.Config.InventoryIngredientColorPreset.Value)
+            : ResolveOwnedColorHex(node.Required, playerCount, storageCount, node.CraftableBySubingredients, node.CraftFromStorage);
 
-        var text = $"<size={textSize}><color=#{color}>{total}</color><color=#FFFFFFFF> / {node.Required}</color></size>";
+        var ownedText = creativeMode ? "-" : total.ToString();
+        var text = $"<size={textSize}><color=#{color}>{ownedText}</color><color=#FFFFFFFF> / {node.Required}</color></size>";
 
         icon.SetIcon(SpriteManager.Get(node.TechType));
         icon.SetText(text);
-        ApplyInventoryOwnedBadge(icon, playerCount, depth);
+
+        if (creativeMode)
+        {
+            ApplyInventoryOwnedBadge(icon, 0, depth);
+        }
+        else
+        {
+            ApplyInventoryOwnedBadge(icon, playerCount, depth);
+        }
+
         icon.gameObject.SetActive(true);
         return icon;
     }
