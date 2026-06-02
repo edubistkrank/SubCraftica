@@ -1,4 +1,4 @@
-# SUBCRAFTICA (v1.1)
+# SUBCRAFTICA (v1.0)
 
 You wake up in the middle of the ocean, your fabricator is hungry, your lockers are chaos, and every recipe asks for three other recipes first.
 
