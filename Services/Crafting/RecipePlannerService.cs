@@ -32,7 +32,7 @@ internal sealed class RecipePlannerService
             return 0;
         }
 
-        return requestAmount * GetCraftAmount(targetTechType);
+        return requestAmount * GetEffectiveOutputPerCraft(targetTechType);
     }
 
     public CraftPlanResult BuildPlan(TechType targetTechType, int targetAmount)
@@ -59,8 +59,8 @@ internal sealed class RecipePlannerService
             return false;
         }
 
-        var craftAmount = GetCraftAmount(targetTechType);
-        var craftsNeeded = (int)Math.Ceiling(targetAmount / (float)craftAmount);
+        var outputPerCraft = GetEffectiveOutputPerCraft(targetTechType);
+        var craftsNeeded = (int)Math.Ceiling(targetAmount / (float)outputPerCraft);
 
         for (var i = 0; i < craftsNeeded; i++)
         {
@@ -101,7 +101,7 @@ internal sealed class RecipePlannerService
             }
         }
 
-        state.AddCrafted(techType, GetCraftAmount(techType));
+        state.AddCrafted(techType, GetBaseCraftAmount(techType));
 
         var linkedItems = TechData.GetLinkedItems(techType);
         if (linkedItems != null)
@@ -154,8 +154,8 @@ internal sealed class RecipePlannerService
             return false;
         }
 
-        var recipeYield = GetCraftAmount(ingredientType);
-        var craftsNeeded = (int)Math.Ceiling(missingAmount / (float)recipeYield);
+        var outputPerCraft = GetEffectiveOutputPerCraft(ingredientType);
+        var craftsNeeded = (int)Math.Ceiling(missingAmount / (float)outputPerCraft);
 
         for (var i = 0; i < craftsNeeded; i++)
         {
@@ -168,10 +168,31 @@ internal sealed class RecipePlannerService
         return true;
     }
 
-    private static int GetCraftAmount(TechType techType)
+    private static int GetBaseCraftAmount(TechType techType)
     {
         var amount = TechData.GetCraftAmount(techType);
         return amount <= 0 ? 1 : amount;
+    }
+
+    private static int GetEffectiveOutputPerCraft(TechType techType)
+    {
+        var output = GetBaseCraftAmount(techType);
+        var linkedItems = TechData.GetLinkedItems(techType);
+        if (linkedItems == null || linkedItems.Count == 0)
+        {
+            return output;
+        }
+
+        var sameTypeLinked = 0;
+        for (var i = 0; i < linkedItems.Count; i++)
+        {
+            if (linkedItems[i] == techType)
+            {
+                sameTypeLinked++;
+            }
+        }
+
+        return output + sameTypeLinked;
     }
 
     private sealed class PlannerState

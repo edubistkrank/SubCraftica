@@ -46,8 +46,8 @@ internal sealed class CraftEnergyService
                 continue;
             }
 
-            var craftAmount = GetCraftAmount(pair.Key);
-            var craftOperations = (int)Math.Ceiling(pair.Value / (float)craftAmount);
+            var outputPerCraft = GetEffectiveOutputPerCraft(pair.Key);
+            var craftOperations = (int)Math.Ceiling(pair.Value / (float)outputPerCraft);
             if (craftOperations <= 0)
             {
                 continue;
@@ -106,15 +106,36 @@ internal sealed class CraftEnergyService
             return GetRequiredEnergy(finalTechType, 1);
         }
 
-        var craftAmount = GetCraftAmount(finalTechType);
-        var craftOperations = (int)Math.Ceiling(craftedFinalUnits / (float)craftAmount);
+        var outputPerCraft = GetEffectiveOutputPerCraft(finalTechType);
+        var craftOperations = (int)Math.Ceiling(craftedFinalUnits / (float)outputPerCraft);
         return GetRequiredEnergy(finalTechType, craftOperations <= 0 ? 1 : craftOperations);
     }
 
-    private static int GetCraftAmount(TechType techType)
+    private static int GetBaseCraftAmount(TechType techType)
     {
         var amount = TechData.GetCraftAmount(techType);
         return amount <= 0 ? 1 : amount;
+    }
+
+    private static int GetEffectiveOutputPerCraft(TechType techType)
+    {
+        var output = GetBaseCraftAmount(techType);
+        var linkedItems = TechData.GetLinkedItems(techType);
+        if (linkedItems == null || linkedItems.Count == 0)
+        {
+            return output;
+        }
+
+        var sameTypeLinked = 0;
+        for (var i = 0; i < linkedItems.Count; i++)
+        {
+            if (linkedItems[i] == techType)
+            {
+                sameTypeLinked++;
+            }
+        }
+
+        return output + sameTypeLinked;
     }
 
     private static float GetBaseEnergy(TechType techType)

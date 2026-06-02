@@ -108,7 +108,9 @@ namespace SubCraftica.Patches
                     }
                 }
 
-                var name = techType.AsString(false);
+                var name = Language.main != null
+                    ? Language.main.Get(TechTypeExtensions.AsString(techType, false))
+                    : TechTypeExtensions.AsString(techType, false);
                 sb.Append(name);
 
                 if (amount > 1)

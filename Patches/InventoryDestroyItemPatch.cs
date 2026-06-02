@@ -11,6 +11,7 @@ internal static class InventoryDestroyItemPatch
 {
     private static bool autoCraftConsumeInProgress;
     private static float lastConstructWarningTime;
+    private static readonly Dictionary<TechType, int> constructBufferedOutputs = new Dictionary<TechType, int>();
 
     [HarmonyPostfix]
     private static void Postfix(Inventory __instance, TechType destroyTechType, ref bool __result)
@@ -39,6 +40,12 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
+        if (TryConsumeBufferedForConstruct(destroyTechType))
+        {
+            __result = true;
+            return;
+        }
+
         if (autoCraftConsumeInProgress || !ConstructableConstructPatchContext.IsActive)
         {
             return;
@@ -61,6 +68,32 @@ internal static class InventoryDestroyItemPatch
         }
 
         TryShowConstructWarning();
+    }
+
+    internal static void FlushConstructSurplus()
+    {
+        if (constructBufferedOutputs.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var pair in constructBufferedOutputs)
+        {
+            var remaining = pair.Value;
+            if (remaining <= 0)
+            {
+                continue;
+            }
+
+            while (remaining > 0)
+            {
+                GiveProducedItem(pair.Key);
+                remaining--;
+            }
+        }
+
+        constructBufferedOutputs.Clear();
+        RecipeOwnedIngredientsTooltipService.MarkDataDirty();
     }
 
     private static bool TryAutoCraftForConstruct(TechType techType)
@@ -91,7 +124,8 @@ internal static class InventoryDestroyItemPatch
                 }
             }
 
-            return true;
+            BufferNetCrafted(plan.Consumed, plan.Crafted);
+            return TryConsumeBufferedForConstruct(techType);
         }
         finally
         {
@@ -115,18 +149,58 @@ internal static class InventoryDestroyItemPatch
         return result;
     }
 
+    private static void BufferNetCrafted(Dictionary<TechType, int> consumed, Dictionary<TechType, int> crafted)
+    {
+        foreach (var pair in crafted)
+        {
+            var used = consumed.TryGetValue(pair.Key, out var consumedAmount) ? consumedAmount : 0;
+            var netProduced = pair.Value - used;
+            if (netProduced <= 0)
+            {
+                continue;
+            }
+
+            AddCount(constructBufferedOutputs, pair.Key, netProduced);
+        }
+    }
+
+    private static bool TryConsumeBufferedForConstruct(TechType techType)
+    {
+        if (!ConstructableConstructPatchContext.IsActive)
+        {
+            return false;
+        }
+
+        if (!constructBufferedOutputs.TryGetValue(techType, out var buffered) || buffered <= 0)
+        {
+            return false;
+        }
+
+        buffered--;
+        if (buffered <= 0)
+        {
+            constructBufferedOutputs.Remove(techType);
+        }
+        else
+        {
+            constructBufferedOutputs[techType] = buffered;
+        }
+
+        return true;
+    }
+
     private static void RestoreConsumed(Dictionary<TechType, int> consumed)
     {
         foreach (var pair in consumed)
         {
             for (var i = 0; i < pair.Value; i++)
             {
-                RestoreSingleItem(pair.Key);
+                GiveProducedItem(pair.Key);
             }
         }
     }
 
-    private static void RestoreSingleItem(TechType techType)
+    private static void GiveProducedItem(TechType techType)
     {
         var gameObject = CraftData.InstantiateFromPrefab(null, techType, false);
         if (gameObject == null)
@@ -143,6 +217,11 @@ internal static class InventoryDestroyItemPatch
 
         pickupable.Pickup(false);
         if (Inventory.main != null && Inventory.main.container != null && Inventory.main.container.AddItem(pickupable) != null)
+        {
+            return;
+        }
+
+        if (Plugin.Services?.NearbyStorage != null && Plugin.Services.NearbyStorage.TryAddToNearbyStorage(pickupable))
         {
             return;
         }

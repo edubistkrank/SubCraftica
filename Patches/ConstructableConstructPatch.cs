@@ -15,7 +15,14 @@ internal static class ConstructableConstructPatch
     [HarmonyFinalizer]
     private static void Finalizer(Exception __exception)
     {
-        ConstructableConstructPatchContext.IsActive = false;
+        try
+        {
+            InventoryDestroyItemPatch.FlushConstructSurplus();
+        }
+        finally
+        {
+            ConstructableConstructPatchContext.IsActive = false;
+        }
     }
 }
 
