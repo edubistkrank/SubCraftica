@@ -65,13 +65,13 @@ internal sealed class QuantitySelectionService
             return;
         }
 
-        if (TryConsumeControllerAdjust(GameInput.Button.UIAdjustRight, GameInput.Button.UIRight))
+        if (TryConsumeControllerAdjust(GameInput.Button.CycleNext, GameInput.Button.UIAdjustRight))
         {
             TryIncrease(techType);
             return;
         }
 
-        if (TryConsumeControllerAdjust(GameInput.Button.UIAdjustLeft, GameInput.Button.UILeft))
+        if (TryConsumeControllerAdjust(GameInput.Button.CyclePrev, GameInput.Button.UIAdjustLeft))
         {
             currentAmount = Mathf.Max(1, currentAmount - 1);
         }
