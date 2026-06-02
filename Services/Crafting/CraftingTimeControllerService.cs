@@ -135,6 +135,8 @@ internal sealed class CraftingTimeControllerService
 
     private static bool IsInstantMode()
     {
-        return Plugin.Services != null && Plugin.Services.Config.CraftingMode.Value == ModConfig.CraftingModeInstant;
+        return Plugin.Services != null
+            && (Plugin.Services.Config.CreativeMode.Value
+                || Plugin.Services.Config.CraftingMode.Value == ModConfig.CraftingModeInstant);
     }
 }

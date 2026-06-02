@@ -1,4 +1,5 @@
 using HarmonyLib;
+using SubCraftica.Services.Configuration;
 
 namespace SubCraftica.Patches;
 
@@ -13,9 +14,9 @@ internal static class CrafterLogicIsCraftRecipeFulfilledPatch
             return;
         }
 
-        if (Plugin.Services.Config.CreativeMode.Value)
+        if (CreativeModeHelper.IsCreativeBypassActive(techType))
         {
-            __result = Plugin.Services.PlannerValidation.CanPlan(techType);
+            __result = true;
             return;
         }
 

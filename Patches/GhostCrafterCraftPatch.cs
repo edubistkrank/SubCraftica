@@ -64,22 +64,14 @@ internal static class GhostCrafterCraftPatch
         var crafted = totalAmount - remainder;
         Services.QueueFeedback.NotifyCraftProgress(techType, crafted, totalAmount);
 
-        var powerRelay = Traverse.Create(instance).Field<PowerRelay>("powerRelay").Value;
-
         if (Services.Config.CreativeMode.Value)
         {
-            var requiredEnergyCreative = Services.Energy.GetRequiredEnergy(techType, 1);
-            if (!Services.Energy.HasEnoughEnergy(powerRelay, techType, requiredEnergyCreative))
-            {
-                HandleNotEnoughPowerFailure(techType, ModConfig.CraftingModePerItem);
-                return false;
-            }
-
             Services.RecipeOverride.ApplyAmountOverride(techType, 1);
-            Services.CraftRuntimeState.SetRequiredEnergy(techType, requiredEnergyCreative);
+            Services.CraftRuntimeState.SetRequiredEnergy(techType, 0f);
             return true;
         }
 
+        var powerRelay = Traverse.Create(instance).Field<PowerRelay>("powerRelay").Value;
         var plan = Services.RecipePlanner.BuildPlan(techType, 1);
         if (!plan.Success)
         {
@@ -116,14 +108,8 @@ internal static class GhostCrafterCraftPatch
         {
             if (Services.Config.CreativeMode.Value)
             {
-                requiredEnergy = Services.Energy.GetRequiredEnergy(techType, craftAmount);
-                if (Services.Energy.HasEnoughEnergy(powerRelay, techType, requiredEnergy))
-                {
-                    break;
-                }
-
-                craftAmount--;
-                continue;
+                requiredEnergy = 0f;
+                break;
             }
 
             plan = Services.RecipePlanner.BuildPlan(techType, craftAmount);
@@ -156,7 +142,7 @@ internal static class GhostCrafterCraftPatch
             return false;
         }
 
-        if (craftAmount < requestedAmount)
+        if (!Services.Config.CreativeMode.Value && craftAmount < requestedAmount)
         {
             // Partial craft due to energy: requeue what could not be crafted
             ErrorMessage.AddWarning(ModText.Get(ModText.WarningNotEnoughPower));

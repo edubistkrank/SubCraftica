@@ -152,17 +152,17 @@ internal static class TooltipFactoryCraftRecipePatch
 
             if (!string.IsNullOrWhiteSpace(left) && !string.IsNullOrWhiteSpace(right))
             {
-                return $"<size=20><color=#00ffffff>{adjustText} ({left} / {right})</color></size>";
+                return $"<size=20>{left} / {right} - <color=#00ffffff>{adjustText}</color></size>";
             }
 
             if (!string.IsNullOrWhiteSpace(left))
             {
-                return $"<size=20><color=#00ffffff>{adjustText} ({left})</color></size>";
+                return $"<size=20>{left} - <color=#00ffffff>{adjustText}</color></size>";
             }
 
             if (!string.IsNullOrWhiteSpace(right))
             {
-                return $"<size=20><color=#00ffffff>{adjustText} ({right})</color></size>";
+                return $"<size=20>{right} - <color=#00ffffff>{adjustText}</color></size>";
             }
 
             return $"<size=20><color=#00ffffff>{adjustText}</color></size>";

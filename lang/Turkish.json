@@ -64,5 +64,9 @@
   "SubCraftica.Tooltip_Amount": "Zanaat",
   "SubCraftica.Tooltip_Total": "Toplam",
   "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Allows crafting without consuming ingredients in any crafter, fabricator, or similar crafting device. Inventory and storages are ignored for ingredient requirements. Warning: this can break the intended game experience."
+  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!"
 }
+

@@ -17,6 +17,11 @@ internal sealed class CraftEnergyService
 
     public float GetRequiredEnergy(TechType techType, int amount)
     {
+        if (config.CreativeMode.Value)
+        {
+            return 0f;
+        }
+
         if (amount <= 0)
         {
             return 0f;
@@ -28,6 +33,11 @@ internal sealed class CraftEnergyService
 
     public float GetRequiredEnergy(TechType finalTechType, Dictionary<TechType, int> crafted)
     {
+        if (config.CreativeMode.Value)
+        {
+            return 0f;
+        }
+
         if (!config.IncludeSubrecipeEnergyCost.Value)
         {
             return GetFinalOnlyRequiredEnergy(finalTechType, crafted);
@@ -61,6 +71,11 @@ internal sealed class CraftEnergyService
 
     public bool HasEnoughEnergy(PowerRelay powerRelay, TechType finalTechType, float requiredTotalEnergy)
     {
+        if (config.CreativeMode.Value)
+        {
+            return true;
+        }
+
         if (powerRelay == null || !GameModeUtils.RequiresPower())
         {
             return true;
@@ -71,13 +86,27 @@ internal sealed class CraftEnergyService
 
     public bool TryConsumePlannedEnergy(PowerRelay powerRelay, TechType finalTechType, float requiredTotalEnergy)
     {
+        if (config.CreativeMode.Value)
+        {
+            // Vanilla already consumed the base energy — refund it
+            if (powerRelay is IPowerInterface creativeRelayInterface && GameModeUtils.RequiresPower())
+            {
+                var vanillaEnergy = GetBaseEnergy(finalTechType);
+                if (vanillaEnergy > 0f)
+                {
+                    float amountAdded;
+                    PowerSystem.AddEnergy(creativeRelayInterface, vanillaEnergy, out amountAdded);
+                }
+            }
+            return true;
+        }
+
         if (powerRelay == null || !GameModeUtils.RequiresPower())
         {
             return true;
         }
 
-        var vanillaEnergy = GetBaseEnergy(finalTechType);
-        var deltaEnergy = requiredTotalEnergy - vanillaEnergy;
+        var deltaEnergy = requiredTotalEnergy - GetBaseEnergy(finalTechType);
 
         if (deltaEnergy > 0f)
         {

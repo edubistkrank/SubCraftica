@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using HarmonyLib;
+using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Localization;
 using SubCraftica.Services.UI;
 using UnityEngine;
@@ -23,7 +24,7 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
-        if (Plugin.Services.Config.CreativeMode.Value && IsCraftOrConstructContextActive())
+        if (CreativeModeHelper.IsCreativeBypassActive(destroyTechType) && IsCraftOrConstructContextActive())
         {
             __result = true;
             return;

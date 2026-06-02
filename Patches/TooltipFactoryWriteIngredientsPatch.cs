@@ -71,7 +71,9 @@ namespace SubCraftica.Patches
                     pickupCount = main.GetPickupCount(techType);
                 }
 
-                if (creativeMode)
+                var creativeModeActive = creativeMode && !CreativeModeHelper.IsExemptFromCreativeBypass(techType);
+
+                if (creativeModeActive)
                 {
                     var invColors = StorageIngredientColorPresets.Colors;
                     var invIdx = Plugin.Services.Config.InventoryIngredientColorPreset.Value;

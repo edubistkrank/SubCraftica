@@ -741,9 +741,10 @@ internal static class RecipeOwnedIngredientsTooltipService
         var playerCount = RecipeCraftabilityResolver.GetPlayerCount(node.TechType, playerContainer);
         var storageCount = RecipeCraftabilityResolver.GetStorageCount(node.TechType, playerContainer);
         var total = playerCount + storageCount;
-        var creativeMode = Plugin.Services?.Config != null && Plugin.Services.Config.CreativeMode.Value;
+        var creativeMode = Plugin.Services?.Config != null && Plugin.Services.Config.CreativeMode.Value
+                           && !CreativeModeHelper.IsExemptFromCreativeBypass(node.TechType);
         var color = creativeMode
-            ? GetPresetColorHex(StorageIngredientColorPresets.Colors, Plugin.Services.Config.InventoryIngredientColorPreset.Value)
+            ? "FFFFFFFF"
             : ResolveOwnedColorHex(node.Required, playerCount, storageCount, node.CraftableBySubingredients, node.CraftFromStorage);
 
         var ownedText = creativeMode ? "-" : total.ToString();

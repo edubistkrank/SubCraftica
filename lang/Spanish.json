@@ -1,4 +1,4 @@
-{
+﻿{
   "SubCraftica.CraftInProgress": "SubCraftica: espera a que termine la fabricación actual.",
   "SubCraftica.CraftAlreadyRunning": "SubCraftica: ya se está procesando una solicitud de fabricación.",
   "SubCraftica.QueueQueued": "SubCraftica: +{0} {1} en cola.",
@@ -31,6 +31,7 @@
   "SubCraftica.OptGroup_Storage": "Uso de almacenamientos",
   "SubCraftica.OptGroup_Energy": "Energía",
   "SubCraftica.OptGroup_Colors": "Colores",
+  "SubCraftica.OptGroup_AreYouSure": "¿Estás seguro?",
   "SubCraftica.OptDesc_EnableAutoSubcraft": "Fabrica automáticamente las subrecetas que falten cuando sea necesario.",
   "SubCraftica.OptDesc_CraftingTooltipMode": "Muestra el estado de ingredientes disponibles y requeridos para fabricar la receta seleccionada.\n<color=#FFAC09FF>Desactivado</color>\nNo se muestra el tooltip de crafteo del mod.\n<color=#FFAC09FF>Básico</color>\nMuestra un único panel compacto con el total de ingredientes necesarios.\n<color=#FFAC09FF>Avanzado</color>\nMuestra panel principal y paneles anidados para subrecetas.",
   "SubCraftica.OptDesc_StorageMode": "Define desde donde se obtienen los ingredientes al fabricar.\n<color=#FFAC09FF>Desactivado</color>\nSolo usa ingredientes del inventario.\n<color=#FFAC09FF>Cercanos</color>\nUsa inventario y almacenamientos dentro del rango configurado.\n<color=#FFAC09FF>Todos (sin rango)</color>\nUsa todos los almacenamientos cargados, sin límite de distancia.",
@@ -64,5 +65,8 @@
   "SubCraftica.Tooltip_Amount": "Fabricar",
   "SubCraftica.Tooltip_Total": "Total",
   "SubCraftica.Opt_CreativeMode": "Modo creativo",
-  "SubCraftica.OptDesc_CreativeMode": "Permite fabricar sin consumir ingredientes en cualquier crafteador, fabricador o dispositivo de fabricación similar. Se ignoran inventario y almacenamientos para los requisitos de ingredientes. Aviso: esto puede romper la experiencia de juego prevista."
+  "SubCraftica.Opt_CreativeMode_Disabled": "Desactivado",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
+  "SubCraftica.OptDesc_CreativeMode": "Solo Modo de fabricación creativo. No otorga invulnerabilidad ni modifica el resto de la supervivencia (hambre, sed, oxígeno, salud, etc.).\n\nLa fabricación ignora la disponibilidad de ingredientes en inventario y almacenamientos.\nTodas las recetas se desbloquean mientras este modo esté activo.\nLa fabricación siempre es instantánea en este modo.\nEl coste de energía siempre queda desactivado en este modo, independientemente de la opción de energía de SubCraftica.\n\nAviso: esto puede romper la experiencia de juego prevista.\n\n<size=9><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>"
 }
+
