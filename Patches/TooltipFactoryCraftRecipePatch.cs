@@ -142,14 +142,8 @@ internal static class TooltipFactoryCraftRecipePatch
     {
         if (isGamepad)
         {
-            var left = GameInput.FormatButton(GameInput.Button.CyclePrev, false);
-            var right = GameInput.FormatButton(GameInput.Button.CycleNext, false);
-
-            if (string.IsNullOrWhiteSpace(left) && string.IsNullOrWhiteSpace(right))
-            {
-                left = GameInput.FormatButton(GameInput.Button.UIAdjustLeft, false);
-                right = GameInput.FormatButton(GameInput.Button.UIAdjustRight, false);
-            }
+            var left = GameInput.FormatButton(GameInput.Button.UIPrevTab, false);
+            var right = GameInput.FormatButton(GameInput.Button.UINextTab, false);
 
             if (!string.IsNullOrWhiteSpace(left) && !string.IsNullOrWhiteSpace(right))
             {

@@ -65,21 +65,21 @@ internal sealed class QuantitySelectionService
             return;
         }
 
-        if (TryConsumeControllerAdjust(GameInput.Button.CycleNext, GameInput.Button.UIAdjustRight))
+        if (TryConsumeControllerAdjust(GameInput.Button.UINextTab))
         {
             TryIncrease(techType);
             return;
         }
 
-        if (TryConsumeControllerAdjust(GameInput.Button.CyclePrev, GameInput.Button.UIAdjustLeft))
+        if (TryConsumeControllerAdjust(GameInput.Button.UIPrevTab))
         {
             currentAmount = Mathf.Max(1, currentAmount - 1);
         }
     }
 
-    private bool TryConsumeControllerAdjust(GameInput.Button primaryButton, GameInput.Button secondaryButton)
+    private bool TryConsumeControllerAdjust(GameInput.Button button)
     {
-        if (GameInput.GetButtonDown(primaryButton) || GameInput.GetButtonDown(secondaryButton))
+        if (GameInput.GetButtonDown(button))
         {
             nextControllerAdjustAt = Time.unscaledTime + ControllerInitialRepeatDelay;
             return true;
@@ -90,7 +90,7 @@ internal sealed class QuantitySelectionService
             return false;
         }
 
-        if (GameInput.GetButtonHeld(primaryButton) || GameInput.GetButtonHeld(secondaryButton))
+        if (GameInput.GetButtonHeld(button))
         {
             nextControllerAdjustAt = Time.unscaledTime + ControllerRepeatInterval;
             return true;
