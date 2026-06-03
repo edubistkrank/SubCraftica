@@ -7,7 +7,7 @@ namespace SubCraftica.Patches;
 internal static class uGUICraftingMenuClosePatch
 {
     [HarmonyPostfix]
-    private static void Postfix()
+    private static void Postfix(uGUI_CraftingMenu __instance)
     {
         if (Plugin.Services == null)
         {
@@ -15,6 +15,21 @@ internal static class uGUICraftingMenuClosePatch
         }
 
         RecipeOwnedIngredientsTooltipService.ResetTrack();
+
+        if (Plugin.Services.Synchronization.IsCraftInProgress)
+        {
+            return;
+        }
+
+        var client = __instance != null ? __instance.client : null;
+        if (client != null && client.inProgress)
+        {
+            return;
+        }
+
+        Plugin.Services.Queue.Clear();
+        Plugin.Services.QueueCoordinator.ClearStopQueueContinuationRequested();
+        Plugin.Services.QueueCoordinator.ResetForQueueEnd();
     }
 }
 

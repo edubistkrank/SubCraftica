@@ -58,7 +58,7 @@ internal static class GhostCrafterCraftPatch
 
         if (remainder > 0)
         {
-            Services.Queue.TryEnqueue(new CraftingRequest(techType, remainder, totalAmount), Services.Config.MaxQueueSize.Value);
+            Services.Queue.TryEnqueueFront(new CraftingRequest(techType, remainder, totalAmount), Services.Config.MaxQueueSize.Value);
         }
 
         var crafted = totalAmount - remainder;
@@ -147,7 +147,7 @@ internal static class GhostCrafterCraftPatch
             // Partial craft due to energy: requeue what could not be crafted
             ErrorMessage.AddWarning(ModText.Get(ModText.WarningNotEnoughPower));
             var remainder = requestedAmount - craftAmount;
-            Services.Queue.TryEnqueue(new CraftingRequest(techType, remainder, requestTotalAmount), Services.Config.MaxQueueSize.Value);
+            Services.Queue.TryEnqueueFront(new CraftingRequest(techType, remainder, requestTotalAmount), Services.Config.MaxQueueSize.Value);
         }
 
         // Mark queue-completed notification if this is the last item in queue

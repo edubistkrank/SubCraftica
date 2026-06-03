@@ -25,7 +25,7 @@ internal sealed class ModServices
         CraftRuntimeState = new CraftRuntimeState();
         Runtime = new CraftRuntimeTrackerService();
         Energy = new CraftEnergyService(config, Math);
-        Quantity = new QuantitySelectionService(config, RecipePlanner);
+        Quantity = new QuantitySelectionService(config, RecipePlanner, Synchronization, Queue);
         TimeController = new CraftingTimeControllerService();
         QueueCoordinator = new CraftQueueCoordinatorService();
     }

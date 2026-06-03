@@ -1,6 +1,5 @@
 using HarmonyLib;
 using SubCraftica.Services.Crafting;
-using SubCraftica.Services.Localization;
 
 namespace SubCraftica.Patches;
 
@@ -18,12 +17,6 @@ internal static class uGUICraftingMenuActionPatch
         if (CraftingMenuClientHelper.IsConstructorClient(__instance))
         {
             return true;
-        }
-
-        if (Plugin.Services.Synchronization.IsCraftInProgress)
-        {
-            ErrorMessage.AddWarning(ModText.Get(ModText.CraftInProgress));
-            return false;
         }
 
         if (!TryResolveTechType(sender, out var techType))
@@ -52,19 +45,17 @@ internal static class uGUICraftingMenuActionPatch
         var queued = Plugin.Services.Queue.TryEnqueue(request, Plugin.Services.Config.MaxQueueSize.Value);
         if (!queued)
         {
-            if (Plugin.Services.Queue.TryPeek(out var head) && head != null && head.TechType != techType)
-            {
-                Plugin.Services.QueueFeedback.NotifyQueueMismatch(head.TechType, techType);
-            }
-            else
-            {
-                Plugin.Services.QueueFeedback.NotifyQueueFull(Plugin.Services.Config.MaxQueueSize.Value);
-            }
-
+            Plugin.Services.QueueFeedback.NotifyQueueFull(Plugin.Services.Config.MaxQueueSize.Value);
             return false;
         }
 
         Plugin.Services.QueueFeedback.NotifyQueued(request);
+
+        if (Plugin.Services.Synchronization.IsCraftInProgress)
+        {
+            return false;
+        }
+
         return true;
     }
 
@@ -109,5 +100,30 @@ internal static class CraftingMenuClientHelper
     {
         var menu = uGUI.main != null ? uGUI.main.craftingMenu : null;
         return IsConstructorClient(menu);
+    }
+}
+
+[HarmonyPatch(typeof(uGUI_CraftingMenu), "SetLocked")]
+internal static class uGUICraftingMenuSetLockedPatch
+{
+    [HarmonyPrefix]
+    private static void Prefix(uGUI_CraftingMenu __instance, ref bool locked)
+    {
+        if (!locked || Plugin.Services == null)
+        {
+            return;
+        }
+
+        if (CraftingMenuClientHelper.IsConstructorClient(__instance))
+        {
+            return;
+        }
+
+        if (!GameInput.GetButtonHeld(GameInput.Button.Sprint))
+        {
+            return;
+        }
+
+        locked = false;
     }
 }
