@@ -1,10 +1,23 @@
+using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Localization;
+using SubCraftica.Services.UI;
 
 namespace SubCraftica.Services.Crafting;
 
 internal sealed class QueueFeedbackService
 {
-    public void NotifyQueued(CraftingRequest request)
+    private readonly QueueProgressMessageService progressMessages;
+    private readonly ModConfig config;
+
+    public QueueFeedbackService(QueueProgressMessageService progressMessages, ModConfig config)
+    {
+        this.progressMessages = progressMessages;
+        this.config = config;
+    }
+
+    private bool IsPerItemMode => config.CraftingMode.Value == ModConfig.CraftingModePerItem;
+
+    public void NotifyQueued(CraftingRequest request, bool craftInProgress)
     {
         if (request == null)
             return;
@@ -14,17 +27,21 @@ internal sealed class QueueFeedbackService
             : TechTypeExtensions.AsString(request.TechType, false);
         var message = ModText.Format(ModText.QueueQueued, request.Amount, name);
         ErrorMessage.AddMessage(message);
+
+        // Progress lines only make sense in per-item mode (batch/instant don't have intermediate steps).
+        if (IsPerItemMode && craftInProgress)
+            progressMessages.RegisterPending(request.TechType, request.TotalAmount);
     }
 
     public void NotifyCraftProgress(TechType techType, int current, int total)
     {
-        if (techType == TechType.None || total <= 1 || current <= 0)
+        if (!IsPerItemMode)
             return;
 
-        var name = Language.main != null
-            ? Language.main.Get(TechTypeExtensions.AsString(techType, false))
-            : TechTypeExtensions.AsString(techType, false);
-        ErrorMessage.AddMessage(ModText.Format(ModText.QueueProgress, name, current, total));
+        if (techType == TechType.None || total <= 0 || current <= 0)
+            return;
+
+        progressMessages.SetProgress(techType, current, total);
     }
 
     public void NotifyQueueFull(int maxQueueSize)
@@ -46,6 +63,17 @@ internal sealed class QueueFeedbackService
 
     public void NotifyQueueCompleted()
     {
+        progressMessages.Clear();
         ErrorMessage.AddMessage(ModText.Get(ModText.QueueCompleted));
+    }
+
+    public void ClearProgress(TechType techType)
+    {
+        progressMessages.RemoveProgress(techType);
+    }
+
+    public void ClearAllProgress()
+    {
+        progressMessages.Clear();
     }
 }

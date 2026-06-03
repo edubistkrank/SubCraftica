@@ -49,7 +49,14 @@ internal static class uGUICraftingMenuActionPatch
             return false;
         }
 
-        Plugin.Services.QueueFeedback.NotifyQueued(request);
+        // Clear focus so the next hover on this item starts at x1
+        Plugin.Services.Quantity.ResetFocus(techType);
+
+        // If craft is in progress OR there are other items already in queue,
+        // this item is waiting — register a pending progress line immediately.
+        var isPending = Plugin.Services.Synchronization.IsCraftInProgress
+                     || Plugin.Services.Queue.Count > 1;
+        Plugin.Services.QueueFeedback.NotifyQueued(request, isPending);
 
         if (Plugin.Services.Synchronization.IsCraftInProgress)
         {

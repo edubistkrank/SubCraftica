@@ -2,6 +2,7 @@ using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Crafting;
 using SubCraftica.Services.Resources;
 using SubCraftica.Services.Stacking;
+using SubCraftica.Services.UI;
 
 namespace SubCraftica.Services.Composition;
 
@@ -12,7 +13,8 @@ internal sealed class ModServices
         Config = config;
         StackingDetection = new StackingDetectionService();
         Queue = new CraftingQueueService();
-        QueueFeedback = new QueueFeedbackService();
+        QueueProgressMessage = new QueueProgressMessageService();
+        QueueFeedback = new QueueFeedbackService(QueueProgressMessage, config);
         Synchronization = new CraftSynchronizationService();
         Math = new CraftingMathService(config);
         StackingCount = new StackingCountService(StackingDetection);
@@ -33,6 +35,7 @@ internal sealed class ModServices
     public ModConfig Config { get; }
     public StackingDetectionService StackingDetection { get; }
     public CraftingQueueService Queue { get; }
+    public QueueProgressMessageService QueueProgressMessage { get; }
     public QueueFeedbackService QueueFeedback { get; }
     public CraftSynchronizationService Synchronization { get; }
     public CraftingMathService Math { get; }

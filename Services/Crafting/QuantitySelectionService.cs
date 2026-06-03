@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using SubCraftica.Services.Configuration;
 using UnityEngine;
 
@@ -14,10 +13,10 @@ internal sealed class QuantitySelectionService
     private readonly RecipePlannerService planner;
     private readonly CraftSynchronizationService synchronization;
     private readonly CraftingQueueService queue;
-    private readonly Dictionary<TechType, int> amountsByTechType = new Dictionary<TechType, int>();
 
-    private TechType currentTechType = TechType.None;
-    private int currentAmount = 1;
+    // Only set by UpdateWithScroll — the item the player is actively adjusting.
+    private TechType focusedTechType = TechType.None;
+    private int focusedAmount = 1;
     private float nextControllerAdjustAt;
     private bool wasCraftSessionActive;
     private float sessionInactiveSince = -1f;
@@ -34,54 +33,56 @@ internal sealed class QuantitySelectionService
         this.queue = queue;
     }
 
+    /// <summary>
+    /// Pure read — returns the focused amount if this is the focused item, otherwise 1.
+    /// Never changes internal focus state.
+    /// </summary>
     public int GetCurrentAmount(TechType techType)
     {
-        var sessionActive = IsCraftSessionActive();
-        SyncSessionState(sessionActive);
+        SyncSessionState(IsCraftSessionActive());
+        return techType != TechType.None && techType == focusedTechType ? focusedAmount : 1;
+    }
 
-        if (currentTechType != techType)
+    /// <summary>
+    /// Called each frame for the item under the cursor. Updates focus and scroll/controller input.
+    /// </summary>
+    public int UpdateWithScroll(TechType techType)
+    {
+        SyncSessionState(IsCraftSessionActive());
+
+        if (techType == TechType.None)
+            return 1;
+
+        // Switching to a different item — reset amount to 1
+        if (techType != focusedTechType)
         {
-            currentTechType = techType;
-            currentAmount = sessionActive ? GetStoredAmount(techType) : 1;
+            focusedTechType = techType;
+            focusedAmount = 1;
             nextControllerAdjustAt = 0f;
         }
 
-        var clamped = Mathf.Clamp(currentAmount, 1, Mathf.Max(1, config.MaxQueueSize.Value));
-        currentAmount = clamped;
-
-        if (sessionActive && techType != TechType.None)
-        {
-            amountsByTechType[techType] = clamped;
-        }
-
-        return clamped;
-    }
-
-    public int UpdateWithScroll(TechType techType)
-    {
-        var amount = GetCurrentAmount(techType);
-
         var scrollDelta = Input.mouseScrollDelta.y;
         if (scrollDelta > 0.01f)
-        {
-            amount = TryIncrease(techType, amount);
-        }
+            focusedAmount = TryIncrease(techType, focusedAmount);
         else if (scrollDelta < -0.01f)
+            focusedAmount = Mathf.Max(1, focusedAmount - 1);
+
+        focusedAmount = HandleControllerAdjust(techType, focusedAmount);
+        focusedAmount = Mathf.Clamp(focusedAmount, 1, Mathf.Max(1, config.MaxQueueSize.Value));
+
+        return focusedAmount;
+    }
+
+    /// <summary>
+    /// Called after the item is sent to queue — clears focus so next hover starts at x1.
+    /// </summary>
+    public void ResetFocus(TechType techType)
+    {
+        if (focusedTechType == techType)
         {
-            amount = Mathf.Max(1, amount - 1);
+            focusedTechType = TechType.None;
+            focusedAmount = 1;
         }
-
-        amount = HandleControllerAdjust(techType, amount);
-
-        currentTechType = techType;
-        currentAmount = amount;
-
-        if (IsCraftSessionActive() && techType != TechType.None)
-        {
-            amountsByTechType[techType] = amount;
-        }
-
-        return amount;
     }
 
     private void SyncSessionState(bool sessionActive)
@@ -94,9 +95,7 @@ internal sealed class QuantitySelectionService
         }
 
         if (!wasCraftSessionActive)
-        {
             return;
-        }
 
         if (sessionInactiveSince < 0f)
         {
@@ -105,13 +104,10 @@ internal sealed class QuantitySelectionService
         }
 
         if (Time.unscaledTime - sessionInactiveSince < SessionEndCleanupDelaySeconds)
-        {
             return;
-        }
 
-        amountsByTechType.Clear();
-        currentTechType = TechType.None;
-        currentAmount = 1;
+        focusedTechType = TechType.None;
+        focusedAmount = 1;
         nextControllerAdjustAt = 0f;
         wasCraftSessionActive = false;
         sessionInactiveSince = -1f;
@@ -123,16 +119,6 @@ internal sealed class QuantitySelectionService
             || (queue != null && queue.Count > 0);
     }
 
-    private int GetStoredAmount(TechType techType)
-    {
-        if (techType == TechType.None)
-        {
-            return 1;
-        }
-
-        return amountsByTechType.TryGetValue(techType, out var amount) ? amount : 1;
-    }
-
     private int HandleControllerAdjust(TechType techType, int amount)
     {
         if (!GameInput.IsPrimaryDeviceGamepad())
@@ -142,14 +128,10 @@ internal sealed class QuantitySelectionService
         }
 
         if (TryConsumeControllerAdjust(GameInput.Button.UINextTab))
-        {
             return TryIncrease(techType, amount);
-        }
 
         if (TryConsumeControllerAdjust(GameInput.Button.UIPrevTab))
-        {
             return Mathf.Max(1, amount - 1);
-        }
 
         return amount;
     }
@@ -163,9 +145,7 @@ internal sealed class QuantitySelectionService
         }
 
         if (Time.unscaledTime < nextControllerAdjustAt)
-        {
             return false;
-        }
 
         if (GameInput.GetButtonHeld(button))
         {
@@ -180,16 +160,12 @@ internal sealed class QuantitySelectionService
     {
         var upperLimit = Mathf.Max(1, config.MaxQueueSize.Value);
         if (currentAmount >= upperLimit)
-        {
             return currentAmount;
-        }
 
         var candidate = currentAmount + 1;
 
         if (config.CreativeMode.Value)
-        {
             return candidate;
-        }
 
         var plan = planner.BuildRequestPlan(techType, candidate);
         return plan.Success ? candidate : currentAmount;

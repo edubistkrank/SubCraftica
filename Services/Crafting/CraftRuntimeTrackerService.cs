@@ -3,6 +3,7 @@ namespace SubCraftica.Services.Crafting;
 internal sealed class CraftRuntimeTrackerService
 {
     private TechType lastTechType = TechType.None;
+    private TechType lastPerItemFinished = TechType.None;
 
     public void SetLastTechType(TechType techType)
     {
@@ -21,5 +22,23 @@ internal sealed class CraftRuntimeTrackerService
         {
             lastTechType = TechType.None;
         }
+    }
+
+    /// <summary>
+    /// Called at per-item craft start so the finished techType survives until OnCraftingEnd.
+    /// </summary>
+    public void SetLastPerItemFinished(TechType techType)
+    {
+        lastPerItemFinished = techType;
+    }
+
+    /// <summary>
+    /// Reads and clears the stored finished techType. Returns TechType.None if not set.
+    /// </summary>
+    public TechType ConsumeLastPerItemFinished()
+    {
+        var t = lastPerItemFinished;
+        lastPerItemFinished = TechType.None;
+        return t;
     }
 }

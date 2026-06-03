@@ -68,6 +68,11 @@ internal static class GhostCrafterCraftingEndPatch
 
     private static IEnumerator HandlePerItemQueueEnd(GhostCrafter crafter)
     {
+        // Consume the techType that just finished — must read it before first yield
+        // because the Finalizer in GhostCrafterCraftPatch clears Runtime.lastTechType
+        // before OnCraftingEnd fires.
+        var finishedTechType = Plugin.Services.Runtime.ConsumeLastPerItemFinished();
+
         yield return null;
 
         if (crafter == null || Plugin.Services == null)
@@ -91,6 +96,7 @@ internal static class GhostCrafterCraftingEndPatch
 
         if (Plugin.Services.QueueCoordinator.ConsumeStopQueueContinuationRequested())
         {
+            Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
             Plugin.Services.QueueCoordinator.ResetForQueueEnd();
             TrySetCraftingMenuLocked(crafter, false);
             yield break;
@@ -103,6 +109,9 @@ internal static class GhostCrafterCraftingEndPatch
             TrySetCraftingMenuLocked(crafter, false);
             yield break;
         }
+
+        // Queue continues — clear the progress line of the item that just finished
+        Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
 
         TrySetCraftingMenuLocked(crafter, true);
 

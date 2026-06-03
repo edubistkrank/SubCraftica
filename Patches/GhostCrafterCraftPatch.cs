@@ -63,6 +63,7 @@ internal static class GhostCrafterCraftPatch
 
         var crafted = totalAmount - remainder;
         Services.QueueFeedback.NotifyCraftProgress(techType, crafted, totalAmount);
+        Services.Runtime.SetLastPerItemFinished(techType);
 
         if (Services.Config.CreativeMode.Value)
         {
@@ -171,6 +172,7 @@ internal static class GhostCrafterCraftPatch
             Services.QueueCoordinator.RequestStopQueueContinuation(Services.Queue);
         }
 
+        Services.QueueFeedback.ClearAllProgress();
         Services.CraftRuntimeState.Clear(techType);
         Services.RecipeOverride.Restore(techType);
         ErrorMessage.AddWarning(Language.main.Get("DontHaveNeededIngredients"));
@@ -184,6 +186,7 @@ internal static class GhostCrafterCraftPatch
             Services.QueueCoordinator.RequestStopQueueContinuation(Services.Queue);
         }
 
+        Services.QueueFeedback.ClearAllProgress();
         Services.CraftRuntimeState.Clear(techType);
         Services.RecipeOverride.Restore(techType);
         ErrorMessage.AddWarning(ModText.Get(ModText.WarningNotEnoughPower));

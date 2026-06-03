@@ -151,6 +151,7 @@
     <Compile Include="Services\Stacking\StackingBackend.cs" />
     <Compile Include="Services\Stacking\StackingDetectionService.cs" />
     <Compile Include="Services\UI\ColorHexUtility.cs" />
+    <Compile Include="Services\UI\QueueProgressMessageService.cs" />
     <Compile Include="Services\UI\RecipeCraftabilityResolver.cs" />
     <Compile Include="Services\UI\RecipeOwnedIngredientsTooltipService.cs" />
   </ItemGroup>
