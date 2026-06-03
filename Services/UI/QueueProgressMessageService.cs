@@ -22,6 +22,10 @@ internal sealed class QueueProgressMessageService
     private const float BottomPadding = 18f; // extra gap between our lines and vanilla messages
     private float vanillaOffsetY = -1f; // cached on first use
 
+    // Active craft: warm amber; pending slots: muted steel blue
+    private const string ColorActive  = "#D4A017";
+    private const string ColorPending = "#5B8DB8";
+
     // ── Public API ────────────────────────────────────────────────────────────
 
     /// <summary>
@@ -34,7 +38,7 @@ internal sealed class QueueProgressMessageService
             return;
 
         // Always create a new entry — duplicate TechTypes are allowed (separate queue slots).
-        var label = TryCreateLabel(BuildText(techType, 0, total));
+        var label = TryCreateLabel(BuildText(techType, 0, total, false));
         if (label == null)
             return;
 
@@ -56,7 +60,7 @@ internal sealed class QueueProgressMessageService
             activeEntry.Current = current;
             activeEntry.Total = total;
             if (activeEntry.Label != null)
-                activeEntry.Label.text = BuildText(techType, current, total);
+                activeEntry.Label.text = BuildText(techType, current, total, true);
             return;
         }
 
@@ -68,7 +72,7 @@ internal sealed class QueueProgressMessageService
             pending.Current = current;
             pending.Total = total;
             if (pending.Label != null)
-                pending.Label.text = BuildText(techType, current, total);
+                pending.Label.text = BuildText(techType, current, total, true);
             // Move to position 0 so the active craft is always on top
             entries.Remove(pending);
             entries.Insert(0, pending);
@@ -78,7 +82,7 @@ internal sealed class QueueProgressMessageService
         }
 
         // Entry not pre-registered (first item, no pending line existed)
-        var label = TryCreateLabel(BuildText(techType, current, total));
+        var label = TryCreateLabel(BuildText(techType, current, total, true));
         if (label == null)
             return;
 
@@ -186,12 +190,13 @@ internal sealed class QueueProgressMessageService
 
     private static ErrorMessage GetMain() => FiMain?.GetValue(null) as ErrorMessage;
 
-    private static string BuildText(TechType techType, int current, int total)
+    private static string BuildText(TechType techType, int current, int total, bool isActive)
     {
         var name = Language.main != null
             ? Language.main.Get(TechTypeExtensions.AsString(techType, false))
             : TechTypeExtensions.AsString(techType, false);
-        return $"{name} ({current}/{total})";
+        var color = isActive ? ColorActive : ColorPending;
+        return $"<color={color}>{name} ({current}/{total})</color>";
     }
 
     // ── Inner types ───────────────────────────────────────────────────────────
