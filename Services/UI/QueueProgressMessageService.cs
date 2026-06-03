@@ -15,8 +15,8 @@ internal sealed class QueueProgressMessageService
     private static readonly FieldInfo FiMain = typeof(ErrorMessage)
         .GetField("main", BindingFlags.NonPublic | BindingFlags.Static);
 
-    // Ordered list of active queue entries (preserves display order)
     private readonly List<QueueEntry> entries = new List<QueueEntry>();
+    private QueueEntry activeEntry; // direct reference — no TechType search needed
 
     private const float LineHeight = 28f;
     private const float BottomPadding = 18f; // extra gap between our lines and vanilla messages
@@ -26,24 +26,14 @@ internal sealed class QueueProgressMessageService
 
     /// <summary>
     /// Registers a pending queue entry showing 0/total immediately.
-    /// For total == 1 no progress line is needed (there is nothing to track).
-    /// Safe to call even if the entry already exists (updates total if different).
+    /// Always creates a new entry — duplicate TechTypes are allowed (separate queue slots).
     /// </summary>
     public void RegisterPending(TechType techType, int total)
     {
         if (techType == TechType.None || total <= 0)
             return;
 
-        var existing = FindEntry(techType);
-        if (existing != null)
-        {
-            // Already registered — update total in case a new batch was added
-            existing.Total = total;
-            if (existing.Label != null)
-                existing.Label.text = BuildText(techType, existing.Current, total);
-            return;
-        }
-
+        // Always create a new entry — duplicate TechTypes are allowed (separate queue slots).
         var label = TryCreateLabel(BuildText(techType, 0, total));
         if (label == null)
             return;
@@ -60,33 +50,56 @@ internal sealed class QueueProgressMessageService
         if (techType == TechType.None || total <= 0 || current <= 0)
             return;
 
-        var existing = FindEntry(techType);
-        if (existing != null)
+        if (activeEntry != null)
         {
-            existing.Current = current;
-            existing.Total = total;
-            if (existing.Label != null)
-                existing.Label.text = BuildText(techType, current, total);
+            // Update the active entry in-place — regardless of TechType
+            activeEntry.Current = current;
+            activeEntry.Total = total;
+            if (activeEntry.Label != null)
+                activeEntry.Label.text = BuildText(techType, current, total);
+            return;
         }
-        else
-        {
-            // Entry not pre-registered (first item in queue — never went through RegisterPending).
-            // Insert at index 0 so the active craft always appears above pending items.
-            var label = TryCreateLabel(BuildText(techType, current, total));
-            if (label == null)
-                return;
 
-            entries.Insert(0, new QueueEntry(techType, current, total, label));
+        // No active entry yet — promote the first pending entry of this type,
+        // or create a new one if none exists.
+        var pending = FindFirstPending(techType);
+        if (pending != null)
+        {
+            pending.Current = current;
+            pending.Total = total;
+            if (pending.Label != null)
+                pending.Label.text = BuildText(techType, current, total);
+            // Move to position 0 so the active craft is always on top
+            entries.Remove(pending);
+            entries.Insert(0, pending);
+            activeEntry = pending;
             RelayoutAll();
+            return;
         }
+
+        // Entry not pre-registered (first item, no pending line existed)
+        var label = TryCreateLabel(BuildText(techType, current, total));
+        if (label == null)
+            return;
+
+        var entry = new QueueEntry(techType, current, total, label);
+        entries.Insert(0, entry);
+        activeEntry = entry;
+        RelayoutAll();
     }
 
     public void RemoveProgress(TechType techType)
     {
-        var entry = FindEntry(techType);
+        var entry = activeEntry;
         if (entry == null)
             return;
 
+        // Only remove when the slot is fully done.
+        // Mid-slot continuations (e.g. 2/4 → 3/4) must not remove the line.
+        if (entry.Current < entry.Total)
+            return;
+
+        activeEntry = null;
         entries.Remove(entry);
 
         if (entry.Label != null)
@@ -97,6 +110,7 @@ internal sealed class QueueProgressMessageService
 
     public void Clear()
     {
+        activeEntry = null;
         foreach (var e in entries)
         {
             if (e.Label != null)
@@ -160,7 +174,7 @@ internal sealed class QueueProgressMessageService
         return tmp;
     }
 
-    private QueueEntry FindEntry(TechType techType)
+    private QueueEntry FindFirstPending(TechType techType)
     {
         foreach (var e in entries)
         {
