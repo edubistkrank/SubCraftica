@@ -51,12 +51,34 @@ internal static class GhostCrafterCraftingEndPatch
     private static readonly MethodInfo CraftingMenuSetLockedMethod = AccessTools.Method(typeof(uGUI_CraftingMenu), "SetLocked");
     private static readonly MethodInfo CrafterHasCraftedItemMethod = AccessTools.Method(typeof(Crafter), "HasCraftedItem");
 
+    [HarmonyPrefix]
+    private static void Prefix(GhostCrafter __instance)
+    {
+        if (__instance == null || Plugin.Services == null)
+        {
+            return;
+        }
+
+        // Vanilla only calls logic.TryPickup() in OnCraftingEnd when
+        // PlayerIsInRange(closeDistance) || pickupOutOfRange.
+        // Force this path so crafted items are pushed immediately even when the player is far.
+        __instance.pickupOutOfRange = true;
+    }
+
     [HarmonyPostfix]
     private static void Postfix(GhostCrafter __instance)
     {
         if (__instance == null || Plugin.Services == null)
         {
             return;
+        }
+
+        // Extra safety: ensure pickup attempt also runs from our side
+        // in case another mod short-circuits vanilla flow.
+        var logic = Traverse.Create(__instance).Field<CrafterLogic>("logic").Value;
+        if (logic != null)
+        {
+            logic.TryPickup();
         }
 
         if (Plugin.Services.Config.CraftingMode.Value != ModConfig.CraftingModePerItem)
@@ -96,8 +118,6 @@ internal static class GhostCrafterCraftingEndPatch
         }
 
         // Resolve crafted output before queue continuation.
-        // If a crafted item remains in crafter tray, wait until it is picked up (auto or manual)
-        // so the next queued craft does not overwrite the tray output.
         if (HasCraftedItem(crafter))
         {
             var logic = Traverse.Create(crafter).Field<CrafterLogic>("logic").Value;
@@ -131,8 +151,6 @@ internal static class GhostCrafterCraftingEndPatch
                 }
 
                 retryFrames++;
-                // Retry pickup periodically so queue can continue automatically
-                // once inventory/storage gets free space.
                 if (logic != null && retryFrames % 30 == 0)
                 {
                     logic.TryPickup();

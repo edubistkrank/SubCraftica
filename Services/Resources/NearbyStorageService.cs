@@ -298,61 +298,37 @@ internal sealed class NearbyStorageService
 
         if (queuedAny)
         {
-            return;
+            pendingVisibleLockerRefreshAll = pendingVisibleLockerOwners.Count == containers.Count;
         }
-
-        pendingVisibleLockerRefreshAll = true;
-    }
-
-    private static bool IsContainerEligible(Component owner, ItemsContainer container)
-    {
-        if (container.containerType != ItemsContainerType.Default)
-        {
-            return false;
-        }
-
-        var storageContainer = owner as StorageContainer;
-        if (storageContainer != null)
-        {
-            if (!string.IsNullOrEmpty(storageContainer.storageLabel) &&
-                storageContainer.storageLabel.StartsWith("Aquarium", StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            var constructable = storageContainer.GetComponent<Constructable>();
-            if (constructable != null && !constructable.constructed)
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void DiscoverContainersIfNeeded()
     {
-        if (Time.unscaledTime < discoveryExpiresAt)
+        if (Time.time < discoveryExpiresAt)
         {
             return;
         }
 
-        discoveryExpiresAt = Time.unscaledTime + DiscoveryIntervalSeconds;
+        discoveryExpiresAt = Time.time + DiscoveryIntervalSeconds;
 
         foreach (var storage in UnityEngine.Object.FindObjectsOfType<StorageContainer>())
         {
-            if (storage != null && storage.container != null)
+            if (storage == null || storage.container == null)
             {
-                Register(storage, storage.container);
+                continue;
             }
+
+            Register(storage, storage.container);
+        }
+    }
+
+    private static bool IsContainerEligible(Component owner, ItemsContainer container)
+    {
+        if (owner == null || container == null)
+        {
+            return false;
         }
 
-        foreach (var seamothStorage in UnityEngine.Object.FindObjectsOfType<SeamothStorageContainer>())
-        {
-            if (seamothStorage != null && seamothStorage.container != null)
-            {
-                Register(seamothStorage, seamothStorage.container);
-            }
-        }
+        return true;
     }
 }
