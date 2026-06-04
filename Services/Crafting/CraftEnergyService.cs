@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SubCraftica.Services.Compat;
 using SubCraftica.Services.Configuration;
 
 namespace SubCraftica.Services.Crafting;
@@ -8,11 +9,13 @@ internal sealed class CraftEnergyService
 {
     private readonly ModConfig config;
     private readonly CraftingMathService math;
+    private readonly PowerSaverCompatService powerSaverCompat;
 
-    public CraftEnergyService(ModConfig config, CraftingMathService math)
+    public CraftEnergyService(ModConfig config, CraftingMathService math, PowerSaverCompatService powerSaverCompat)
     {
         this.config = config ?? throw new ArgumentNullException(nameof(config));
         this.math = math ?? throw new ArgumentNullException(nameof(math));
+        this.powerSaverCompat = powerSaverCompat ?? throw new ArgumentNullException(nameof(powerSaverCompat));
     }
 
     public float GetRequiredEnergy(TechType techType, int amount)
@@ -81,7 +84,8 @@ internal sealed class CraftEnergyService
             return true;
         }
 
-        return powerRelay.GetPower() >= requiredTotalEnergy;
+        var effectiveRequired = ApplyPowerSaverBaseMultiplier(requiredTotalEnergy);
+        return powerRelay.GetPower() >= effectiveRequired;
     }
 
     public bool TryConsumePlannedEnergy(PowerRelay powerRelay, TechType finalTechType, float requiredTotalEnergy)
@@ -110,7 +114,8 @@ internal sealed class CraftEnergyService
 
         if (deltaEnergy > 0f)
         {
-            if (powerRelay.GetPower() < deltaEnergy)
+            var effectiveDeltaEnergy = ApplyPowerSaverBaseMultiplier(deltaEnergy);
+            if (powerRelay.GetPower() < effectiveDeltaEnergy)
             {
                 return false;
             }
@@ -175,5 +180,15 @@ internal sealed class CraftEnergyService
         }
 
         return 5f;
+    }
+
+    private float ApplyPowerSaverBaseMultiplier(float value)
+    {
+        if (value <= 0f)
+        {
+            return value;
+        }
+
+        return value * powerSaverCompat.GetBaseDrainMultiplier();
     }
 }

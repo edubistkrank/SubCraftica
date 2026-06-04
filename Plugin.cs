@@ -18,6 +18,7 @@ namespace SubCraftica;
 [BepInDependency("com.snmodding.nautilus", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("mades.redo.inventorystacking", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("com.Complot69.virtualstack", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("com.zerotheabsolute.powersaver", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency(SubCraftica.Patches.Compat.VisibleLockerInteriorCompatPatch.PluginGuid, BepInDependency.DependencyFlags.SoftDependency)]
 public sealed class Plugin : BaseUnityPlugin
 {

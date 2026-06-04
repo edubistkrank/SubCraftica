@@ -1,3 +1,4 @@
+using SubCraftica.Services.Compat;
 using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Crafting;
 using SubCraftica.Services.Resources;
@@ -17,6 +18,7 @@ internal sealed class ModServices
         QueueFeedback = new QueueFeedbackService(QueueProgressMessage, config);
         Synchronization = new CraftSynchronizationService();
         Math = new CraftingMathService(config);
+        PowerSaverCompat = new PowerSaverCompatService();
         StackingCount = new StackingCountService(StackingDetection);
         NearbyStorage = new NearbyStorageService(config, StackingCount);
         StorageExtractionExclusions = new StorageExtractionExclusionService(config);
@@ -26,7 +28,7 @@ internal sealed class ModServices
         RecipeOverride = new RecipeDataOverrideService();
         CraftRuntimeState = new CraftRuntimeState();
         Runtime = new CraftRuntimeTrackerService();
-        Energy = new CraftEnergyService(config, Math);
+        Energy = new CraftEnergyService(config, Math, PowerSaverCompat);
         Quantity = new QuantitySelectionService(config, RecipePlanner, Synchronization, Queue);
         TimeController = new CraftingTimeControllerService();
         QueueCoordinator = new CraftQueueCoordinatorService();
@@ -39,6 +41,7 @@ internal sealed class ModServices
     public QueueFeedbackService QueueFeedback { get; }
     public CraftSynchronizationService Synchronization { get; }
     public CraftingMathService Math { get; }
+    public PowerSaverCompatService PowerSaverCompat { get; }
     public StackingCountService StackingCount { get; }
     public NearbyStorageService NearbyStorage { get; }
     public StorageExtractionExclusionService StorageExtractionExclusions { get; }
