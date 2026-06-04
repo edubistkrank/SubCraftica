@@ -6,6 +6,7 @@
   "SubCraftica.QueueFull": "SubCraftica: queue is full ({0}).",
   "SubCraftica.QueueMismatch": "SubCraftica: queue expects {0}, current request is {1}.",
   "SubCraftica.QueueCompleted": "<color=#94DE00FF>SubCraftica: queue completed.</color>",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: queue stopped.</color>",
   "SubCraftica.WarningNotEnoughPower": "<color=#DF4026FF>Not enough power.</color>",
   "SubCraftica.WarningConstructAutoCraftFailed": "<color=#DF4026FF>SubCraftica: Unable to auto-craft a subcomponent.</color>",
   "SubCraftica.WarningInventoryMovedToStorage": "<color=#DF4026FF>Inventory full - Moved to storage.</color>",

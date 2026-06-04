@@ -6,6 +6,7 @@
   "SubCraftica.QueueFull": "SubCraftica: la cola está llena ({0}).",
   "SubCraftica.QueueMismatch": "SubCraftica: la cola espera {0}, la solicitud actual es {1}.",
   "SubCraftica.QueueCompleted": "<color=#94DE00FF>SubCraftica: cola completada.</color>",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: cola detenida.</color>",
   "SubCraftica.WarningNotEnoughPower": "<color=#DF4026FF>No hay energía.</color>",
   "SubCraftica.WarningConstructAutoCraftFailed": "<color=#DF4026FF>SubCraftica: No se pudo autocraftear un subcomponente.</color>",
   "SubCraftica.WarningInventoryMovedToStorage": "<color=#DF4026FF>Inventario lleno - movido al almacenamiento.</color>",

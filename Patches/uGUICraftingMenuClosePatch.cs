@@ -16,18 +16,7 @@ internal static class uGUICraftingMenuClosePatch
 
         RecipeOwnedIngredientsTooltipService.ResetTrack();
 
-        if (Plugin.Services.Synchronization.IsCraftInProgress)
-        {
-            return;
-        }
-
-        var client = __instance != null ? __instance.client : null;
-        if (client != null && client.inProgress)
-        {
-            return;
-        }
-
-        Plugin.Services.Queue.Clear();
+        // Preserve queue on menu close. Closing UI should not cancel queued work.
         Plugin.Services.QueueCoordinator.ClearStopQueueContinuationRequested();
         Plugin.Services.QueueCoordinator.ResetForQueueEnd();
     }

@@ -17,6 +17,7 @@ internal static class ModText
     public const string QueueFull = "SubCraftica.QueueFull";
     public const string QueueMismatch = "SubCraftica.QueueMismatch";
     public const string QueueCompleted = "SubCraftica.QueueCompleted";
+    public const string QueueStopped = "SubCraftica.QueueStopped";
     public const string WarningNotEnoughPower = "SubCraftica.WarningNotEnoughPower";
     public const string WarningConstructAutoCraftFailed = "SubCraftica.WarningConstructAutoCraftFailed";
     public const string WarningInventoryMovedToStorage = "SubCraftica.WarningInventoryMovedToStorage";

@@ -30,18 +30,16 @@ internal static class CrafterLogicTryPickupSinglePatch
         var useStorageFallback = Plugin.Services.Config.ReturnSurplusToStorage.Value
             && Plugin.Services.Config.StorageCraftMode.Value != Services.Configuration.ModConfig.StorageModeDisabled;
         var useStackingPickupCompat = Plugin.Services.StackingDetection.Backend != StackingBackend.Vanilla;
-        if (!useStorageFallback && !useStackingPickupCompat)
-        {
-            return true;
-        }
 
-        __result = TryPickupWithCompatibility(__instance, techType, result, useStorageFallback);
+        // Always run the compatibility pickup pipeline so each produced unit is handled
+        // immediately, even when the crafting menu is closed or the player is far away.
+        __result = TryPickupWithCompatibility(__instance, techType, result, useStorageFallback, useStackingPickupCompat);
         return false;
     }
 
     // --- Orchestrator ---
 
-    private static IEnumerator TryPickupWithCompatibility(CrafterLogic instance, TechType techType, IOut<bool> result, bool useStorageFallback)
+    private static IEnumerator TryPickupWithCompatibility(CrafterLogic instance, TechType techType, IOut<bool> result, bool useStorageFallback, bool useStackingPickupCompat)
     {
         var coordinator = Plugin.Services?.QueueCoordinator;
         coordinator?.BeginPickupOperation();
@@ -65,7 +63,7 @@ internal static class CrafterLogicTryPickupSinglePatch
                 pickupable.SetTechTypeOverride(techType, true);
             }
 
-            if (TryPlaceInInventory(instance, go, pickupable))
+            if (TryPlaceInInventory(instance, go, pickupable, useStackingPickupCompat))
             {
                 result.Set(true);
                 RecipeOwnedIngredientsTooltipService.MarkDataDirty();
@@ -80,7 +78,7 @@ internal static class CrafterLogicTryPickupSinglePatch
                 yield break;
             }
 
-            // Phase 4: failure
+            // Phase 4: hard failure (inventory + optional storage full)
             HandlePickupFailure(go, useStorageFallback, coordinator);
             result.Set(false);
             RecipeOwnedIngredientsTooltipService.MarkDataDirty();
@@ -99,7 +97,7 @@ internal static class CrafterLogicTryPickupSinglePatch
         return new PrefabResolveResult(request);
     }
 
-    private static bool TryPlaceInInventory(CrafterLogic instance, GameObject go, Pickupable pickupable)
+    private static bool TryPlaceInInventory(CrafterLogic instance, GameObject go, Pickupable pickupable, bool useStackingPickupCompat)
     {
         var inventory = Inventory.main;
         var itemSize = TechData.GetItemSize(pickupable.GetTechType());
@@ -111,6 +109,11 @@ internal static class CrafterLogicTryPickupSinglePatch
             Player.main.PlayGrab();
             NotifyPickup(instance, go);
             return true;
+        }
+
+        if (!useStackingPickupCompat)
+        {
+            return false;
         }
 
         // Stacking compat path: Pickup + AddItem
@@ -156,9 +159,12 @@ internal static class CrafterLogicTryPickupSinglePatch
         {
             // Additional mod warning: storage was also tried and failed. Shown only when storage fallback is active.
             ErrorMessage.AddWarning(ModText.Get(ModText.WarningNoSpaceInventoryAndStorage));
-            coordinator?.RequestStopQueueContinuation(Plugin.Services?.Queue);
-            coordinator?.ResetForQueueEnd();
         }
+
+        // Always stop continuation after pickup failure to avoid overwriting/losing crafted outputs
+        // across subsequent queued crafts when inventory/storage cannot receive items.
+        coordinator?.RequestStopQueueContinuation(Plugin.Services?.Queue);
+        coordinator?.ResetForQueueEnd();
     }
 
     // --- Utilities ---

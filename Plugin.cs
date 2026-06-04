@@ -7,6 +7,7 @@ using Nautilus.Handlers;
 using SubCraftica.Patches;
 using SubCraftica.Services.Composition;
 using SubCraftica.Services.Configuration;
+using SubCraftica.Services.Localization;
 using SubCraftica.Services.Resources;
 using SubCraftica.Services.Stacking;
 using SubCraftica.Services.UI;
@@ -84,9 +85,31 @@ public sealed class Plugin : BaseUnityPlugin
     private void Update()
     {
         TryLateStackingRedetect();
+        TryStopQueueHotkey();
         Services?.NearbyStorage?.Update();
         Services?.TimeController.Update();
         RecipeOwnedIngredientsTooltipService.Update();
+    }
+
+    private void TryStopQueueHotkey()
+    {
+        if (Services == null || !Input.GetKeyDown(KeyCode.Backspace))
+        {
+            return;
+        }
+
+        var hadQueuedItems = Services.Queue.Count > 0;
+        var hadActiveCraft = Services.Synchronization.IsCraftInProgress;
+        if (!hadQueuedItems && !hadActiveCraft)
+        {
+            return;
+        }
+
+        Services.Queue.Clear();
+        Services.QueueFeedback.ClearAllProgress();
+        Services.QueueCoordinator.RequestStopQueueContinuation(Services.Queue);
+
+        ErrorMessage.AddMessage(ModText.Get(ModText.QueueStopped));
     }
 
     private static void RefreshStackingBackend(string source)

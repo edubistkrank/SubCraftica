@@ -49,6 +49,7 @@ internal static class GhostCrafterCraftingEndPatch
     private const string CraftingMenuLockWarningKey = "GhostCrafterCraftingEnd.SetLocked";
     private static readonly MethodInfo GhostCrafterCraftMethod = AccessTools.Method(typeof(GhostCrafter), "Craft", new[] { typeof(TechType), typeof(float) });
     private static readonly MethodInfo CraftingMenuSetLockedMethod = AccessTools.Method(typeof(uGUI_CraftingMenu), "SetLocked");
+    private static readonly MethodInfo CrafterHasCraftedItemMethod = AccessTools.Method(typeof(Crafter), "HasCraftedItem");
 
     [HarmonyPostfix]
     private static void Postfix(GhostCrafter __instance)
@@ -94,6 +95,53 @@ internal static class GhostCrafterCraftingEndPatch
             yield return null;
         }
 
+        // Resolve crafted output before queue continuation.
+        // If a crafted item remains in crafter tray, wait until it is picked up (auto or manual)
+        // so the next queued craft does not overwrite the tray output.
+        if (HasCraftedItem(crafter))
+        {
+            var logic = Traverse.Create(crafter).Field<CrafterLogic>("logic").Value;
+            if (logic != null)
+            {
+                logic.TryPickup();
+            }
+
+            waitFrames = 0;
+            while (Plugin.Services.QueueCoordinator.HasPendingPickupOperations && waitFrames < 60)
+            {
+                waitFrames++;
+                yield return null;
+            }
+
+            var retryFrames = 0;
+            while (HasCraftedItem(crafter))
+            {
+                if (Plugin.Services == null || crafter == null)
+                {
+                    yield break;
+                }
+
+                // If queue was manually stopped (Backspace), honor it immediately.
+                if (Plugin.Services.QueueCoordinator.ConsumeStopQueueContinuationRequested())
+                {
+                    Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
+                    Plugin.Services.QueueCoordinator.ResetForQueueEnd();
+                    TrySetCraftingMenuLocked(crafter, false);
+                    yield break;
+                }
+
+                retryFrames++;
+                // Retry pickup periodically so queue can continue automatically
+                // once inventory/storage gets free space.
+                if (logic != null && retryFrames % 30 == 0)
+                {
+                    logic.TryPickup();
+                }
+
+                yield return null;
+            }
+        }
+
         if (Plugin.Services.QueueCoordinator.ConsumeStopQueueContinuationRequested())
         {
             Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
@@ -119,6 +167,24 @@ internal static class GhostCrafterCraftingEndPatch
         TechData.GetCraftTime(next.TechType, out duration);
 
         GhostCrafterCraftMethod?.Invoke(crafter, new object[] { next.TechType, duration });
+    }
+
+    private static bool HasCraftedItem(GhostCrafter crafter)
+    {
+        if (crafter == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var result = CrafterHasCraftedItemMethod?.Invoke(crafter, null);
+            return result is bool has && has;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static void TrySetCraftingMenuLocked(GhostCrafter crafter, bool locked)
