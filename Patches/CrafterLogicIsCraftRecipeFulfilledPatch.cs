@@ -20,6 +20,29 @@ internal static class CrafterLogicIsCraftRecipeFulfilledPatch
             return;
         }
 
+        var defabCompat = Plugin.Services.DefabricatorCompat;
+        if (defabCompat != null)
+        {
+            if (defabCompat.IsRecycleModeActive)
+            {
+                if (defabCompat.IsDefabricationActiveFor(techType))
+                {
+                    var recycleAmount = GetRequestedAmount(techType);
+                    __result = defabCompat.CanRecycleAmount(techType, recycleAmount);
+                }
+
+                // While Defabricator recycle mode is active, do not force-enable buttons
+                // from crafting planner logic.
+                return;
+            }
+
+            // Outside recycle mode, do not override Defabricator synthetic entries.
+            if (defabCompat.IsDefabricationActiveFor(techType))
+            {
+                return;
+            }
+        }
+
         if (__result)
         {
             return;

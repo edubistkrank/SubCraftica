@@ -80,6 +80,7 @@ internal static class ModText
     public const string Tooltip_Total = "SubCraftica.Tooltip_Total";
     public const string OptDesc_InternalExtractionExcludedStorageIds = "SubCraftica.OptDesc_InternalExtractionExcludedStorageIds";
     public const string OptDesc_InternalPreferredSurplusStorageIds = "SubCraftica.OptDesc_InternalPreferredSurplusStorageIds";
+    public const string Tooltip_Recycle = "SubCraftica.Tooltip_Recycle";
 
     private static readonly object SyncRoot = new object();
     private static readonly FieldInfo CurrentLanguageField = typeof(Language).GetField("currentLanguage", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);

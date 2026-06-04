@@ -65,10 +65,20 @@ internal static class GhostCrafterCraftPatch
         Services.QueueFeedback.NotifyCraftProgress(techType, crafted, totalAmount);
         Services.Runtime.SetLastPerItemFinished(techType);
 
+        var isDefabRecycle = Services.DefabricatorCompat != null
+                             && Services.DefabricatorCompat.IsDefabricationActiveFor(techType);
+
         if (Services.Config.CreativeMode.Value)
         {
             Services.RecipeOverride.ApplyAmountOverride(techType, 1);
             Services.CraftRuntimeState.SetRequiredEnergy(techType, 0f);
+            return true;
+        }
+
+        if (isDefabRecycle)
+        {
+            Services.RecipeOverride.Restore(techType);
+            Services.CraftRuntimeState.SetRequiredEnergy(techType, Services.Energy.GetRequiredEnergy(techType, 1));
             return true;
         }
 
@@ -99,6 +109,34 @@ internal static class GhostCrafterCraftPatch
         var requestedAmount = request.Amount;
         var requestTotalAmount = request.TotalAmount;
         var powerRelay = Traverse.Create(instance).Field<PowerRelay>("powerRelay").Value;
+
+        var isDefabRecycle = Services.DefabricatorCompat != null
+                             && Services.DefabricatorCompat.IsDefabricationActiveFor(techType);
+
+        if (isDefabRecycle && !Services.Config.CreativeMode.Value)
+        {
+            if (!Services.DefabricatorCompat.CanRecycleAmount(techType, requestedAmount))
+            {
+                HandleMissingIngredientsFailure(techType, craftingMode);
+                return false;
+            }
+
+            Services.RecipeOverride.Restore(techType);
+            var recycleEnergy = Services.Energy.GetRequiredEnergy(techType, requestedAmount);
+            if (!Services.Energy.HasEnoughEnergy(powerRelay, techType, recycleEnergy))
+            {
+                HandleNotEnoughPowerFailure(techType, craftingMode);
+                return false;
+            }
+
+            if (Services.Queue.Count == 0)
+            {
+                Services.QueueCoordinator.SetShouldNotifyQueueCompleted();
+            }
+
+            Services.CraftRuntimeState.SetRequiredEnergy(techType, recycleEnergy);
+            return true;
+        }
 
         var craftAmount = requestedAmount;
         float requiredEnergy = 0f;

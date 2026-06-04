@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using TMPro;
 using UnityEngine;
+using SubCraftica.Services.Localization;
 
 namespace SubCraftica.Services.UI;
 
@@ -192,10 +193,27 @@ internal sealed class QueueProgressMessageService
 
     private static string BuildText(TechType techType, int current, int total, bool isActive)
     {
+        var color = isActive ? ColorActive : ColorPending;
+
+        var defabCompat = Plugin.Services?.DefabricatorCompat;
+        if (defabCompat != null && defabCompat.TryGetOriginTechType(techType, out var origin) && origin != TechType.None)
+        {
+            var originName = Language.main != null
+                ? Language.main.Get(TechTypeExtensions.AsString(origin, false))
+                : TechTypeExtensions.AsString(origin, false);
+
+            var recycleVerb = ModText.Get(ModText.Tooltip_Recycle);
+            if (string.IsNullOrWhiteSpace(recycleVerb) || recycleVerb == ModText.Tooltip_Recycle)
+            {
+                recycleVerb = "Recycle";
+            }
+
+            return $"<color={color}>{recycleVerb} {originName} ({current}/{total})</color>";
+        }
+
         var name = Language.main != null
             ? Language.main.Get(TechTypeExtensions.AsString(techType, false))
             : TechTypeExtensions.AsString(techType, false);
-        var color = isActive ? ColorActive : ColorPending;
         return $"<color={color}>{name} ({current}/{total})</color>";
     }
 

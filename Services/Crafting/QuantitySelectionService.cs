@@ -1,3 +1,4 @@
+using SubCraftica.Services.Compat;
 using SubCraftica.Services.Configuration;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ internal sealed class QuantitySelectionService
     private readonly RecipePlannerService planner;
     private readonly CraftSynchronizationService synchronization;
     private readonly CraftingQueueService queue;
+    private readonly DefabricatorCompatService defabricatorCompat;
 
     // Only set by UpdateWithScroll — the item the player is actively adjusting.
     private TechType focusedTechType = TechType.None;
@@ -25,12 +27,14 @@ internal sealed class QuantitySelectionService
         ModConfig config,
         RecipePlannerService planner,
         CraftSynchronizationService synchronization,
-        CraftingQueueService queue)
+        CraftingQueueService queue,
+        DefabricatorCompatService defabricatorCompat)
     {
         this.config = config;
         this.planner = planner;
         this.synchronization = synchronization;
         this.queue = queue;
+        this.defabricatorCompat = defabricatorCompat;
     }
 
     /// <summary>
@@ -163,6 +167,13 @@ internal sealed class QuantitySelectionService
             return currentAmount;
 
         var candidate = currentAmount + 1;
+
+        if (defabricatorCompat != null && defabricatorCompat.IsDefabricationActiveFor(techType))
+        {
+            return defabricatorCompat.CanRecycleAmount(techType, candidate)
+                ? candidate
+                : currentAmount;
+        }
 
         if (config.CreativeMode.Value)
             return candidate;

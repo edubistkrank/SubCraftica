@@ -24,6 +24,18 @@ internal static class uGUICraftingMenuActionPatch
             return true;
         }
 
+        var defabCompat = Plugin.Services.DefabricatorCompat;
+        var isDefabRecycle = defabCompat != null && defabCompat.IsDefabricationActiveFor(techType);
+
+        if (!Plugin.Services.Config.CreativeMode.Value && !isDefabRecycle)
+        {
+            var unlockState = KnownTech.GetTechUnlockState(techType);
+            if (unlockState != TechUnlockState.Available)
+            {
+                return false;
+            }
+        }
+
         var amount = Plugin.Services.Quantity.GetCurrentAmount(techType);
         var request = new CraftingRequest(techType, amount);
 
@@ -34,11 +46,22 @@ internal static class uGUICraftingMenuActionPatch
 
         if (!Plugin.Services.Config.CreativeMode.Value)
         {
-            var plan = Plugin.Services.RecipePlanner.BuildRequestPlan(techType, request.Amount);
-            if (!plan.Success)
+            if (isDefabRecycle)
             {
-                ErrorMessage.AddWarning(Language.main.Get("DontHaveNeededIngredients"));
-                return false;
+                if (!defabCompat.CanRecycleAmount(techType, request.Amount))
+                {
+                    ErrorMessage.AddWarning(Language.main.Get("DontHaveNeededIngredients"));
+                    return false;
+                }
+            }
+            else
+            {
+                var plan = Plugin.Services.RecipePlanner.BuildRequestPlan(techType, request.Amount);
+                if (!plan.Success)
+                {
+                    ErrorMessage.AddWarning(Language.main.Get("DontHaveNeededIngredients"));
+                    return false;
+                }
             }
         }
 

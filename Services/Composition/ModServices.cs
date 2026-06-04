@@ -18,6 +18,7 @@ internal sealed class ModServices
         QueueFeedback = new QueueFeedbackService(QueueProgressMessage, config);
         Synchronization = new CraftSynchronizationService();
         Math = new CraftingMathService(config);
+        DefabricatorCompat = new DefabricatorCompatService();
         PowerSaverCompat = new PowerSaverCompatService();
         StackingCount = new StackingCountService(StackingDetection);
         NearbyStorage = new NearbyStorageService(config, StackingCount);
@@ -29,7 +30,7 @@ internal sealed class ModServices
         CraftRuntimeState = new CraftRuntimeState();
         Runtime = new CraftRuntimeTrackerService();
         Energy = new CraftEnergyService(config, Math, PowerSaverCompat);
-        Quantity = new QuantitySelectionService(config, RecipePlanner, Synchronization, Queue);
+        Quantity = new QuantitySelectionService(config, RecipePlanner, Synchronization, Queue, DefabricatorCompat);
         TimeController = new CraftingTimeControllerService();
         QueueCoordinator = new CraftQueueCoordinatorService();
     }
@@ -41,6 +42,7 @@ internal sealed class ModServices
     public QueueFeedbackService QueueFeedback { get; }
     public CraftSynchronizationService Synchronization { get; }
     public CraftingMathService Math { get; }
+    public DefabricatorCompatService DefabricatorCompat { get; }
     public PowerSaverCompatService PowerSaverCompat { get; }
     public StackingCountService StackingCount { get; }
     public NearbyStorageService NearbyStorage { get; }

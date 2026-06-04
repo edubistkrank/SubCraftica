@@ -138,6 +138,8 @@ internal static class RecipeOwnedIngredientsTooltipService
 
     internal static void Update()
     {
+        var isDefabRecycle = Plugin.Services?.DefabricatorCompat != null && Plugin.Services.DefabricatorCompat.IsRecycleModeActive;
+
         if (_trackedTechType == TechType.None || _trackedLocked)
         {
             Hide();
@@ -147,6 +149,11 @@ internal static class RecipeOwnedIngredientsTooltipService
         var tooltipMode = Plugin.Services?.Config != null
             ? Plugin.Services.Config.CraftingTooltipMode.Value
             : ModConfig.CraftingTooltipModeAdvanced;
+
+        if (isDefabRecycle)
+        {
+            tooltipMode = ModConfig.CraftingTooltipModeBasic;
+        }
 
         if (tooltipMode == ModConfig.CraftingTooltipModeDisabled)
         {
@@ -341,7 +348,10 @@ internal static class RecipeOwnedIngredientsTooltipService
 
     private static List<IngredientNode> BuildMainNodes(int tooltipMode)
     {
-        var cacheKey = tooltipMode + ":" + (int)_trackedTechType + ":" + _trackedAmount + ":" + _dataVersion;
+        var isDefabRecycle = Plugin.Services?.DefabricatorCompat != null
+                             && Plugin.Services.DefabricatorCompat.IsDefabricationActiveFor(_trackedTechType);
+
+        var cacheKey = tooltipMode + ":" + (int)_trackedTechType + ":" + _trackedAmount + ":" + _dataVersion + ":" + (isDefabRecycle ? "defab" : "normal");
         if (MainNodesCache.TryGetValue(cacheKey, out var cached))
         {
             return cached;
@@ -350,6 +360,37 @@ internal static class RecipeOwnedIngredientsTooltipService
         var result = new List<IngredientNode>();
         if (Plugin.Services == null)
         {
+            return result;
+        }
+
+        if (isDefabRecycle)
+        {
+            var linked = Plugin.Services.DefabricatorCompat.GetRecycleLinkedItems(_trackedTechType);
+            if (linked != null && linked.Count > 0)
+            {
+                var recycleAmount = Mathf.Max(1, _trackedAmount);
+                var counts = new Dictionary<TechType, int>();
+                for (var i = 0; i < linked.Count; i++)
+                {
+                    var tech = linked[i];
+                    if (!counts.ContainsKey(tech))
+                    {
+                        counts[tech] = 0;
+                    }
+
+                    counts[tech] += recycleAmount;
+                }
+
+                foreach (var pair in counts)
+                {
+                    if (pair.Value > 0)
+                    {
+                        result.Add(new IngredientNode(pair.Key, pair.Value));
+                    }
+                }
+            }
+
+            MainNodesCache[cacheKey] = result;
             return result;
         }
 
@@ -737,6 +778,19 @@ internal static class RecipeOwnedIngredientsTooltipService
         var textSize = depth <= 0 ? RootTextSize : NestedTextSize;
         icon.SetSize(iconSize, iconSize);
 
+        var isDefabRecycle = Plugin.Services?.DefabricatorCompat != null
+                             && Plugin.Services.DefabricatorCompat.IsDefabricationActiveFor(_trackedTechType);
+
+        if (isDefabRecycle)
+        {
+            var text = $"<size={textSize}><color=#FFFFFFFF>{node.Required}</color></size>";
+            icon.SetIcon(SpriteManager.Get(node.TechType));
+            icon.SetText(text);
+            ApplyInventoryOwnedBadge(icon, 0, depth);
+            icon.gameObject.SetActive(true);
+            return icon;
+        }
+
         var playerContainer = Inventory.main != null ? Inventory.main.container : null;
         var playerCount = RecipeCraftabilityResolver.GetPlayerCount(node.TechType, playerContainer);
         var storageCount = RecipeCraftabilityResolver.GetStorageCount(node.TechType, playerContainer);
@@ -748,10 +802,10 @@ internal static class RecipeOwnedIngredientsTooltipService
             : ResolveOwnedColorHex(node.Required, playerCount, storageCount, node.CraftableBySubingredients, node.CraftFromStorage);
 
         var ownedText = creativeMode ? "-" : total.ToString();
-        var text = $"<size={textSize}><color=#{color}>{ownedText}</color><color=#FFFFFFFF> / {node.Required}</color></size>";
+        var textNormal = $"<size={textSize}><color=#{color}>{ownedText}</color><color=#FFFFFFFF> / {node.Required}</color></size>";
 
         icon.SetIcon(SpriteManager.Get(node.TechType));
-        icon.SetText(text);
+        icon.SetText(textNormal);
 
         if (creativeMode)
         {

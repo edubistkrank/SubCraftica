@@ -94,48 +94,103 @@ internal static class TooltipFactoryCraftRecipePatch
         if (Plugin.Services?.Quantity == null || data == null)
             return;
 
-        var trackedAmount = Plugin.Services.Quantity.GetCurrentAmount(techType);
-        RecipeOwnedIngredientsTooltipService.Track(techType, locked, trackedAmount);
+        var defabCompat = Plugin.Services.DefabricatorCompat;
+        var isDefabRecycle = defabCompat != null && defabCompat.IsDefabricationActiveFor(techType);
 
-        if (locked)
-            return;
-
-        if (!CrafterLogic.IsCraftRecipeFulfilled(techType))
-            return;
-
-        var unlockState = KnownTech.GetTechUnlockState(techType);
-        if (unlockState.ToString() != "Available")
-            return;
-
-        var amount = Plugin.Services.Quantity.UpdateWithScroll(techType);
-        RecipeOwnedIngredientsTooltipService.Track(techType, locked, amount);
-
-        var icon = GetMiddleMouseIcon();
-        var scrollUpIcon = GetScrollUpIcon();
-        var scrollDownIcon = GetScrollDownIcon();
-        var adjustText = ModText.Get(ModText.Tooltip_AdjustAmount);
-
-        var isGamepad = GameInput.IsPrimaryDeviceGamepad();
-        var adjustLine = BuildAdjustLine(adjustText, isGamepad, icon, scrollUpIcon, scrollDownIcon);
-
-        var label = ModText.Get(ModText.Tooltip_Amount);
-        var craftAmount = TechData.GetCraftAmount(techType);
-        if (craftAmount <= 0)
+        if (!isDefabRecycle)
         {
-            craftAmount = 1;
-        }
+            var trackedAmount = Plugin.Services.Quantity.GetCurrentAmount(techType);
+            RecipeOwnedIngredientsTooltipService.Track(techType, locked, trackedAmount);
 
-        var amountLine = $"<align=center><size=20><color=#94DE00FF>{label} <size=20>x</size></color></size><size=28><color=#94DE00FF>{amount}</color></size>";
-        if (craftAmount > 1)
+            if (locked)
+                return;
+
+            // Normal crafting keeps vanilla gating.
+            if (!isDefabRecycle)
+            {
+                if (!CrafterLogic.IsCraftRecipeFulfilled(techType))
+                    return;
+
+                var unlockState = KnownTech.GetTechUnlockState(techType);
+                if (unlockState.ToString() != "Available")
+                    return;
+            }
+
+            var amount = Plugin.Services.Quantity.UpdateWithScroll(techType);
+
+            RecipeOwnedIngredientsTooltipService.Track(techType, locked, amount);
+
+            var icon = GetMiddleMouseIcon();
+            var scrollUpIcon = GetScrollUpIcon();
+            var scrollDownIcon = GetScrollDownIcon();
+            var adjustText = ModText.Get(ModText.Tooltip_AdjustAmount);
+
+            var isGamepad = GameInput.IsPrimaryDeviceGamepad();
+            var adjustLine = BuildAdjustLine(adjustText, isGamepad, icon, scrollUpIcon, scrollDownIcon);
+            data.postfix.AppendLine($"\n{adjustLine}");
+
+            if (!isDefabRecycle)
+            {
+                var label = ModText.Get(ModText.Tooltip_Amount);
+                var craftAmount = TechData.GetCraftAmount(techType);
+                if (craftAmount <= 0)
+                {
+                    craftAmount = 1;
+                }
+
+                var normalAmountLine = $"<align=center><size=20><color=#94DE00FF>{label} <size=20>x</size></color></size><size=28><color=#94DE00FF>{amount}</color></size>";
+                if (craftAmount > 1)
+                {
+                    var totalLabel = ModText.Get(ModText.Tooltip_Total);
+                    normalAmountLine += $"<size=20><color=#94DE00FF> ({totalLabel} x{amount * craftAmount})</color></size>";
+                }
+
+                normalAmountLine += "</align>";
+                data.postfix.AppendLine($"\n{normalAmountLine}");
+                return;
+            }
+        }
+        else
         {
-            var totalLabel = ModText.Get(ModText.Tooltip_Total);
-            amountLine += $"<size=20><color=#94DE00FF> ({totalLabel} x{amount * craftAmount})</color></size>";
+            var trackedAmount = Plugin.Services.Quantity.GetCurrentAmount(techType);
+            RecipeOwnedIngredientsTooltipService.Track(techType, locked, trackedAmount);
+
+            if (locked)
+                return;
+
+            // Normal crafting keeps vanilla gating.
+            if (!isDefabRecycle)
+            {
+                if (!CrafterLogic.IsCraftRecipeFulfilled(techType))
+                    return;
+
+                var unlockState = KnownTech.GetTechUnlockState(techType);
+                if (unlockState.ToString() != "Available")
+                    return;
+            }
+
+            var amount = Plugin.Services.Quantity.UpdateWithScroll(techType);
+
+            RecipeOwnedIngredientsTooltipService.Track(techType, locked, amount);
+
+            var icon = GetMiddleMouseIcon();
+            var scrollUpIcon = GetScrollUpIcon();
+            var scrollDownIcon = GetScrollDownIcon();
+            var adjustText = ModText.Get(ModText.Tooltip_AdjustAmount);
+
+            var isGamepad = GameInput.IsPrimaryDeviceGamepad();
+            var adjustLine = BuildAdjustLine(adjustText, isGamepad, icon, scrollUpIcon, scrollDownIcon);
+            data.postfix.AppendLine($"\n{adjustLine}");
+
+            // Defabricator recycle mode
+            var recycleVerb = ModText.Get(ModText.Tooltip_Recycle);
+            if (string.IsNullOrWhiteSpace(recycleVerb) || recycleVerb == ModText.Tooltip_Recycle)
+            {
+                recycleVerb = "Recycle";
+            }
+
+            data.postfix.AppendLine($"\n<align=center><size=24><color=#D4A017>{recycleVerb} x{amount}</color></size></align>");
         }
-
-        amountLine += "</align>";
-
-        data.postfix.AppendLine($"\n{adjustLine}");
-        data.postfix.AppendLine($"\n{amountLine}");
     }
 
     private static string BuildAdjustLine(string adjustText, bool isGamepad, string mouseMiddleIcon, string scrollUpIcon, string scrollDownIcon)
