@@ -121,6 +121,7 @@
     <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Compat\DefabricatorCompatService.cs" />
+    <Compile Include="Services\Compat\InferiusQoLCompatService.cs" />
     <Compile Include="Services\Compat\PowerSaverCompatService.cs" />
     <Compile Include="Services\Composition\ModServices.cs" />
     <Compile Include="Services\Configuration\MissingIngredientColorPresets.cs" />

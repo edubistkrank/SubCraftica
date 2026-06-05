@@ -20,6 +20,7 @@ namespace SubCraftica;
 [BepInDependency("mades.redo.inventorystacking", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("com.Complot69.virtualstack", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("com.zerotheabsolute.powersaver", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("InferiusQoL", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency(SubCraftica.Patches.Compat.VisibleLockerInteriorCompatPatch.PluginGuid, BepInDependency.DependencyFlags.SoftDependency)]
 public sealed class Plugin : BaseUnityPlugin
 {
@@ -37,6 +38,7 @@ public sealed class Plugin : BaseUnityPlugin
         var config = ModConfig.Bind(Config);
         Services = new ModServices(config);
         RefreshStackingBackend("Awake");
+        Services.InferiusQoLCompat?.Tick();
 
         OptionsPanelHandler.RegisterModOptions(new SubCrafticaOptions(config));
 
@@ -85,6 +87,7 @@ public sealed class Plugin : BaseUnityPlugin
     private void Update()
     {
         TryLateStackingRedetect();
+        Services?.InferiusQoLCompat?.Tick();
         TryStopQueueHotkey();
         Services?.NearbyStorage?.Update();
         Services?.TimeController.Update();

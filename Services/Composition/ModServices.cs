@@ -20,6 +20,7 @@ internal sealed class ModServices
         Math = new CraftingMathService(config);
         DefabricatorCompat = new DefabricatorCompatService();
         PowerSaverCompat = new PowerSaverCompatService();
+        InferiusQoLCompat = new InferiusQoLCompatService();
         StackingCount = new StackingCountService(StackingDetection);
         NearbyStorage = new NearbyStorageService(config, StackingCount);
         StorageExtractionExclusions = new StorageExtractionExclusionService(config);
@@ -44,6 +45,7 @@ internal sealed class ModServices
     public CraftingMathService Math { get; }
     public DefabricatorCompatService DefabricatorCompat { get; }
     public PowerSaverCompatService PowerSaverCompat { get; }
+    public InferiusQoLCompatService InferiusQoLCompat { get; }
     public StackingCountService StackingCount { get; }
     public NearbyStorageService NearbyStorage { get; }
     public StorageExtractionExclusionService StorageExtractionExclusions { get; }
