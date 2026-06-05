@@ -22,6 +22,8 @@ internal static class TooltipFactoryCraftRecipePatch
     private static string _middleMouseIconCache = null;
     private static string _scrollUpIconCache = null;
     private static string _scrollDownIconCache = null;
+    private static string _plusKeyIconCache = null;
+    private static string _minusKeyIconCache = null;
 
     private static string GetMiddleMouseIcon()
     {
@@ -58,6 +60,34 @@ internal static class TooltipFactoryCraftRecipePatch
         });
 
         return _scrollDownIconCache;
+    }
+
+    private static string GetPlusKeyIcon()
+    {
+        if (_plusKeyIconCache != null)
+            return _plusKeyIconCache;
+
+        _plusKeyIconCache = ResolveInputIcon(new[]
+        {
+            "<Keyboard>/numpadPlus",
+            "<Keyboard>/equals"
+        });
+
+        return _plusKeyIconCache;
+    }
+
+    private static string GetMinusKeyIcon()
+    {
+        if (_minusKeyIconCache != null)
+            return _minusKeyIconCache;
+
+        _minusKeyIconCache = ResolveInputIcon(new[]
+        {
+            "<Keyboard>/numpadMinus",
+            "<Keyboard>/minus"
+        });
+
+        return _minusKeyIconCache;
     }
 
     private static string ResolveInputIcon(string[] inputPaths)
@@ -221,8 +251,8 @@ internal static class TooltipFactoryCraftRecipePatch
         if (!string.IsNullOrEmpty(scrollUpIcon) && !string.IsNullOrEmpty(scrollDownIcon))
         {
             return string.IsNullOrEmpty(mouseMiddleIcon)
-                ? $"<size=20><color=#00ffffff>{adjustText} ({scrollUpIcon} / {scrollDownIcon})</color></size>"
-                : $"<size=20>{mouseMiddleIcon} - <color=#00ffffff>{adjustText} ({scrollUpIcon} / {scrollDownIcon})</color></size>";
+                ? $"<size=20><color=#00ffffff>{adjustText} ({scrollUpIcon}+ / {scrollDownIcon}-)</color></size>"
+                : $"<size=20>{mouseMiddleIcon} - <color=#00ffffff>{adjustText} ({scrollUpIcon}+ / {scrollDownIcon}-)</color></size>";
         }
 
         return string.IsNullOrEmpty(mouseMiddleIcon)

@@ -71,6 +71,11 @@ internal sealed class QuantitySelectionService
         else if (scrollDelta < -0.01f)
             focusedAmount = Mathf.Max(1, focusedAmount - 1);
 
+        if (TryConsumeKeyboardIncrease())
+            focusedAmount = TryIncrease(techType, focusedAmount);
+        else if (TryConsumeKeyboardDecrease())
+            focusedAmount = Mathf.Max(1, focusedAmount - 1);
+
         focusedAmount = HandleControllerAdjust(techType, focusedAmount);
         focusedAmount = Mathf.Clamp(focusedAmount, 1, Mathf.Max(1, config.MaxQueueSize.Value));
 
@@ -180,5 +185,15 @@ internal sealed class QuantitySelectionService
 
         var plan = planner.BuildRequestPlan(techType, candidate);
         return plan.Success ? candidate : currentAmount;
+    }
+
+    private static bool TryConsumeKeyboardIncrease()
+    {
+        return Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus);
+    }
+
+    private static bool TryConsumeKeyboardDecrease()
+    {
+        return Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus);
     }
 }
