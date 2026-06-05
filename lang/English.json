@@ -55,6 +55,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: options restored to default values.",
   "SubCraftica.StorageMode_Disabled": "Disabled",
   "SubCraftica.StorageMode_Nearby": "Nearby",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
   "SubCraftica.StorageMode_AllLoaded": "All (no range)",
   "SubCraftica.CraftingMode_PerItem": "Per-item",
   "SubCraftica.CraftingMode_Batch": "Batch",
@@ -71,3 +72,5 @@
   "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=9><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
   "SubCraftica.Tooltip_Recycle": "Recycle"
 }
+
+

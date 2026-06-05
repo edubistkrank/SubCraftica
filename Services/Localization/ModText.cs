@@ -68,6 +68,7 @@ internal static class ModText
     public const string Opt_ResetToDefaultsDone = "SubCraftica.Opt_ResetToDefaultsDone";
     public const string StorageMode_Disabled = "SubCraftica.StorageMode_Disabled";
     public const string StorageMode_Nearby = "SubCraftica.StorageMode_Nearby";
+    public const string StorageMode_InsideBasePod = "SubCraftica.StorageMode_InsideBasePod";
     public const string StorageMode_AllLoaded = "SubCraftica.StorageMode_AllLoaded";
     public const string CraftingMode_PerItem = "SubCraftica.CraftingMode_PerItem";
     public const string CraftingMode_Batch = "SubCraftica.CraftingMode_Batch";

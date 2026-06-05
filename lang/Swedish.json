@@ -53,6 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: alternativ återställda till standardvärden.",
   "SubCraftica.StorageMode_Disabled": "Av",
   "SubCraftica.StorageMode_Nearby": "Nära",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
   "SubCraftica.StorageMode_AllLoaded": "Alla (utan räckvidd)",
   "SubCraftica.CraftingMode_PerItem": "Per objekt",
   "SubCraftica.CraftingMode_Batch": "Batch",
@@ -70,3 +71,5 @@
   "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
   "SubCraftica.Tooltip_Recycle": "Recycle"
 }
+
+

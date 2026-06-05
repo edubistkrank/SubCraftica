@@ -53,6 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica：選項恢復為預設值。",
   "SubCraftica.StorageMode_Disabled": "殘障人士",
   "SubCraftica.StorageMode_Nearby": "附近",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
   "SubCraftica.StorageMode_AllLoaded": "全部（無範圍）",
   "SubCraftica.CraftingMode_PerItem": "每個項目",
   "SubCraftica.CraftingMode_Batch": "批次",
@@ -70,3 +71,5 @@
   "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
   "SubCraftica.Tooltip_Recycle": "Recycle"
 }
+
+

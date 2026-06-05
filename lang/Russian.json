@@ -53,6 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: параметры восстановлены по умолчанию.",
   "SubCraftica.StorageMode_Disabled": "Отключено",
   "SubCraftica.StorageMode_Nearby": "Рядом",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
   "SubCraftica.StorageMode_AllLoaded": "Все (без радиуса)",
   "SubCraftica.CraftingMode_PerItem": "По предмету",
   "SubCraftica.CraftingMode_Batch": "Пакет",
@@ -70,3 +71,5 @@
   "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
   "SubCraftica.Tooltip_Recycle": "Recycle"
 }
+
+

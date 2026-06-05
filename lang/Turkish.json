@@ -53,6 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: seçenekler varsayılan değerlere geri yüklendi.",
   "SubCraftica.StorageMode_Disabled": "Engelli",
   "SubCraftica.StorageMode_Nearby": "Yakında",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
   "SubCraftica.StorageMode_AllLoaded": "Hepsi (aralık yok)",
   "SubCraftica.CraftingMode_PerItem": "Öğe başına",
   "SubCraftica.CraftingMode_Batch": "Grup",
@@ -70,3 +71,5 @@
   "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
   "SubCraftica.Tooltip_Recycle": "Recycle"
 }
+
+

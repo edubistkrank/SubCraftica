@@ -53,6 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: 옵션이 기본값으로 복원되었습니다.",
   "SubCraftica.StorageMode_Disabled": "장애가 있는",
   "SubCraftica.StorageMode_Nearby": "가까운",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
   "SubCraftica.StorageMode_AllLoaded": "모두(범위 없음)",
   "SubCraftica.CraftingMode_PerItem": "품목별",
   "SubCraftica.CraftingMode_Batch": "일괄",
@@ -70,3 +71,5 @@
   "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
   "SubCraftica.Tooltip_Recycle": "Recycle"
 }
+
+

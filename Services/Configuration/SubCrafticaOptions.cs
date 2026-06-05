@@ -328,6 +328,7 @@ internal sealed class SubCrafticaOptions : ModOptions
         {
             ModText.Get(ModText.StorageMode_Disabled),
             ModText.Get(ModText.StorageMode_Nearby),
+            ModText.Get(ModText.StorageMode_InsideBasePod),
             ModText.Get(ModText.StorageMode_AllLoaded)
         }, ModConfig.StorageModeDisabled, ModConfig.StorageModeAllLoaded);
     }

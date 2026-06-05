@@ -12,7 +12,8 @@ internal sealed class ModConfig
 
     public const int StorageModeDisabled = 0;
     public const int StorageModeNearby = 1;
-    public const int StorageModeAllLoaded = 2;
+    public const int StorageModeInsideBasePod = 2;
+    public const int StorageModeAllLoaded = 3;
     public const int StorageColorPresetMin = 0;
     public const int StorageColorPresetMax = 16;
     public const int InventoryColorPresetMin = 0;

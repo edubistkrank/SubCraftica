@@ -183,7 +183,9 @@ internal sealed class NearbyStorageService
         DiscoverContainersIfNeeded();
 
         var playerPosition = Player.main.transform.position;
-        var useAllLoaded = config.StorageCraftMode.Value == ModConfig.StorageModeAllLoaded;
+        var mode = config.StorageCraftMode.Value;
+        var useAllLoaded = mode == ModConfig.StorageModeAllLoaded;
+        var useInsideBasePod = mode == ModConfig.StorageModeInsideBasePod;
         var maxDistanceSquared = config.StorageRange.Value * config.StorageRange.Value;
 
         var uniqueContainers = new HashSet<ItemsContainer>();
@@ -227,6 +229,14 @@ internal sealed class NearbyStorageService
             if (!uniqueContainers.Add(container))
             {
                 continue;
+            }
+
+            if (useInsideBasePod)
+            {
+                if (!IsOwnerInsideCurrentBaseOrPod(owner))
+                {
+                    continue;
+                }
             }
 
             var distanceSquared = (owner.transform.position - playerPosition).sqrMagnitude;
@@ -330,5 +340,39 @@ internal sealed class NearbyStorageService
         }
 
         return true;
+    }
+
+    private static bool IsOwnerInsideCurrentBaseOrPod(Component owner)
+    {
+        if (owner == null || Player.main == null || !Player.main.IsInside())
+        {
+            return false;
+        }
+
+        var ownerTransform = owner.transform;
+        if (ownerTransform == null)
+        {
+            return false;
+        }
+
+        var escapePod = Player.main.currentEscapePod;
+        if (escapePod != null)
+        {
+            if (ownerTransform.IsChildOf(escapePod.transform))
+            {
+                return true;
+            }
+        }
+
+        var currentSub = Player.main.currentSub;
+        if (currentSub != null)
+        {
+            if (ownerTransform.IsChildOf(currentSub.transform))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

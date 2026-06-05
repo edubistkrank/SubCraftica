@@ -55,6 +55,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: opciones restauradas a los valores por defecto.",
   "SubCraftica.StorageMode_Disabled": "Desactivado",
   "SubCraftica.StorageMode_Nearby": "Cercanos",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
   "SubCraftica.StorageMode_AllLoaded": "Todos (sin rango)",
   "SubCraftica.CraftingMode_PerItem": "Por ítem",
   "SubCraftica.CraftingMode_Batch": "Lote",
@@ -71,3 +72,5 @@
   "SubCraftica.OptDesc_CreativeMode": "Solo Modo de fabricación creativo. No otorga invulnerabilidad ni modifica el resto de la supervivencia (hambre, sed, oxígeno, salud, etc.).\n\nLa fabricación ignora la disponibilidad de ingredientes en inventario y almacenamientos.\nTodas las recetas se desbloquean mientras este modo esté activo.\nLa fabricación siempre es instantánea en este modo.\nEl coste de energía siempre queda desactivado en este modo, independientemente de la opción de energía de SubCraftica.\n\nAviso: esto puede romper la experiencia de juego prevista.\n\n<size=9><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
   "SubCraftica.Tooltip_Recycle": "Reciclar"
 }
+
+

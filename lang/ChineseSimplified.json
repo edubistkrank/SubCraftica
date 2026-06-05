@@ -53,6 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica：选项恢复为默认值。",
   "SubCraftica.StorageMode_Disabled": "残疾人",
   "SubCraftica.StorageMode_Nearby": "附近",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
   "SubCraftica.StorageMode_AllLoaded": "全部（无范围）",
   "SubCraftica.CraftingMode_PerItem": "每个项目",
   "SubCraftica.CraftingMode_Batch": "批",
@@ -70,3 +71,5 @@
   "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
   "SubCraftica.Tooltip_Recycle": "Recycle"
 }
+
+
