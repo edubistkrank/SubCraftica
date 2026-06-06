@@ -35,6 +35,11 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
+        if (autoCraftConsumeInProgress)
+        {
+            return;
+        }
+
         __result = Plugin.Services.NearbyStorage.DestroyInNearby(destroyTechType, 1, __instance.container);
         if (__result)
         {
