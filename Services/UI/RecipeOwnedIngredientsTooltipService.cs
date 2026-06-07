@@ -403,47 +403,55 @@ internal static class RecipeOwnedIngredientsTooltipService
         var playerContainer = Inventory.main != null ? Inventory.main.container : null;
         var amount = Mathf.Max(1, _trackedAmount);
 
-        if (tooltipMode == ModConfig.CraftingTooltipModeBasic)
+        RecipeCraftabilityResolver.BeginEvaluationSession(playerContainer);
+        try
         {
-            var aggregate = new Dictionary<TechType, int>();
+            if (tooltipMode == ModConfig.CraftingTooltipModeBasic)
+            {
+                var aggregate = new Dictionary<TechType, int>();
+                for (var i = 0; i < ingredients.Count; i++)
+                {
+                    var ingredient = ingredients[i];
+                    var required = Mathf.Max(0, ingredient.amount * amount);
+                    AggregateBasicRequirements(ingredient.techType, required, aggregate, new HashSet<TechType>());
+                }
+
+                foreach (var pair in aggregate)
+                {
+                    if (pair.Value > 0)
+                    {
+                        result.Add(new IngredientNode(pair.Key, pair.Value));
+                    }
+                }
+
+                MainNodesCache[cacheKey] = result;
+                return result;
+            }
+
             for (var i = 0; i < ingredients.Count; i++)
             {
                 var ingredient = ingredients[i];
                 var required = Mathf.Max(0, ingredient.amount * amount);
-                AggregateBasicRequirements(ingredient.techType, required, aggregate, new HashSet<TechType>());
-            }
+                var node = new IngredientNode(ingredient.techType, required);
 
-            foreach (var pair in aggregate)
-            {
-                if (pair.Value > 0)
+                var available = RecipeCraftabilityResolver.GetAvailableCount(ingredient.techType, playerContainer);
+                var missing = Mathf.Max(0, required - available);
+                if (missing > 0 && RecipeCraftabilityResolver.CanExpandSubrecipe(ingredient.techType))
                 {
-                    result.Add(new IngredientNode(pair.Key, pair.Value));
+                    RecipeCraftabilityResolver.ResolveNodeCraftability(node, missing, 1, MaxNestedDepth, playerContainer);
                 }
+
+                result.Add(node);
             }
 
             MainNodesCache[cacheKey] = result;
+
             return result;
         }
-
-        for (var i = 0; i < ingredients.Count; i++)
+        finally
         {
-            var ingredient = ingredients[i];
-            var required = Mathf.Max(0, ingredient.amount * amount);
-            var node = new IngredientNode(ingredient.techType, required);
-
-            var available = RecipeCraftabilityResolver.GetAvailableCount(ingredient.techType, playerContainer);
-            var missing = Mathf.Max(0, required - available);
-            if (missing > 0 && RecipeCraftabilityResolver.CanExpandSubrecipe(ingredient.techType))
-            {
-                RecipeCraftabilityResolver.ResolveNodeCraftability(node, missing, 1, MaxNestedDepth, playerContainer);
-            }
-
-            result.Add(node);
+            RecipeCraftabilityResolver.EndEvaluationSession();
         }
-
-        MainNodesCache[cacheKey] = result;
-
-        return result;
     }
 
     private static void AggregateBasicRequirements(TechType techType, int amountNeeded, Dictionary<TechType, int> aggregate, HashSet<TechType> path)

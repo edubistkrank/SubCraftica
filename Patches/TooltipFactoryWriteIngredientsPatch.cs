@@ -36,8 +36,6 @@ namespace SubCraftica.Patches
             if (Plugin.Services == null)
                 return true;
 
-            RecipeOwnedIngredientsTooltipService.MarkDataDirty();
-
             if (icons == null)
                 return false;
 

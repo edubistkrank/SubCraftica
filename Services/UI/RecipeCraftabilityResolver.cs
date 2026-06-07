@@ -4,6 +4,35 @@ namespace SubCraftica.Services.UI;
 
 internal static class RecipeCraftabilityResolver
 {
+    private static ItemsContainer _sessionPlayerContainer;
+    private static readonly Dictionary<TechType, int> SessionPlayerCountCache = new Dictionary<TechType, int>();
+    private static readonly Dictionary<TechType, int> SessionStorageCountCache = new Dictionary<TechType, int>();
+    private static readonly Dictionary<TechType, int> SessionAvailableCountCache = new Dictionary<TechType, int>();
+    private static readonly Dictionary<(TechType techType, int requiredAmount), CraftSource> SessionCraftSourceCache = new Dictionary<(TechType techType, int requiredAmount), CraftSource>();
+
+    internal static void BeginEvaluationSession(ItemsContainer playerContainer)
+    {
+        if (_sessionPlayerContainer == playerContainer)
+        {
+            return;
+        }
+
+        _sessionPlayerContainer = playerContainer;
+        SessionPlayerCountCache.Clear();
+        SessionStorageCountCache.Clear();
+        SessionAvailableCountCache.Clear();
+        SessionCraftSourceCache.Clear();
+    }
+
+    internal static void EndEvaluationSession()
+    {
+        _sessionPlayerContainer = null;
+        SessionPlayerCountCache.Clear();
+        SessionStorageCountCache.Clear();
+        SessionAvailableCountCache.Clear();
+        SessionCraftSourceCache.Clear();
+    }
+
     internal static bool CanExpandSubrecipe(TechType techType)
     {
         var services = Plugin.Services;
@@ -22,32 +51,64 @@ internal static class RecipeCraftabilityResolver
 
     internal static int GetAvailableCount(TechType techType, ItemsContainer playerContainer)
     {
-        return GetPlayerCount(techType, playerContainer) + GetStorageCount(techType, playerContainer);
+        if (_sessionPlayerContainer == playerContainer && SessionAvailableCountCache.TryGetValue(techType, out var cached))
+        {
+            return cached;
+        }
+
+        var value = GetPlayerCount(techType, playerContainer) + GetStorageCount(techType, playerContainer);
+        if (_sessionPlayerContainer == playerContainer)
+        {
+            SessionAvailableCountCache[techType] = value;
+        }
+
+        return value;
     }
 
     internal static int GetPlayerCount(TechType techType, ItemsContainer playerContainer)
     {
+        if (_sessionPlayerContainer == playerContainer && SessionPlayerCountCache.TryGetValue(techType, out var cached))
+        {
+            return cached;
+        }
+
+        var value = 0;
         if (playerContainer != null && Plugin.Services?.StackingCount != null)
         {
-            return Plugin.Services.StackingCount.GetContainerCount(playerContainer, techType);
+            value = Plugin.Services.StackingCount.GetContainerCount(playerContainer, techType);
         }
-
-        if (playerContainer != null)
+        else if (playerContainer != null)
         {
-            return playerContainer.GetCount(techType);
+            value = playerContainer.GetCount(techType);
         }
 
-        return 0;
+        if (_sessionPlayerContainer == playerContainer)
+        {
+            SessionPlayerCountCache[techType] = value;
+        }
+
+        return value;
     }
 
     internal static int GetStorageCount(TechType techType, ItemsContainer playerContainer)
     {
-        if (Plugin.Services?.NearbyStorage == null)
+        if (_sessionPlayerContainer == playerContainer && SessionStorageCountCache.TryGetValue(techType, out var cached))
         {
-            return 0;
+            return cached;
         }
 
-        return Plugin.Services.NearbyStorage.GetNearbyCount(techType, playerContainer);
+        var value = 0;
+        if (Plugin.Services?.NearbyStorage != null)
+        {
+            value = Plugin.Services.NearbyStorage.GetNearbyCount(techType, playerContainer);
+        }
+
+        if (_sessionPlayerContainer == playerContainer)
+        {
+            SessionStorageCountCache[techType] = value;
+        }
+
+        return value;
     }
 
     internal static void ResolveNodeCraftability(IngredientNode node, int missingAmount, int depth, int maxDepth, ItemsContainer playerContainer)
@@ -188,6 +249,15 @@ internal static class RecipeCraftabilityResolver
 
     private static CraftSource GetSubrecipeCraftSource(TechType techType, int requiredAmount, ItemsContainer playerContainer)
     {
+        if (_sessionPlayerContainer == playerContainer)
+        {
+            var key = (techType, requiredAmount);
+            if (SessionCraftSourceCache.TryGetValue(key, out var cached))
+            {
+                return cached;
+            }
+        }
+
         var services = Plugin.Services;
         if (services?.RecipePlanner == null || requiredAmount <= 0)
         {
@@ -236,7 +306,13 @@ internal static class RecipeCraftabilityResolver
             return CraftSource.None;
         }
 
-        return usesStorage ? CraftSource.Storage : CraftSource.Inventory;
+        var resolved = usesStorage ? CraftSource.Storage : CraftSource.Inventory;
+        if (_sessionPlayerContainer == playerContainer)
+        {
+            SessionCraftSourceCache[(techType, requiredAmount)] = resolved;
+        }
+
+        return resolved;
     }
 
     private static CraftSource GetChildCraftSource(List<IngredientNode> children, ItemsContainer playerContainer)
