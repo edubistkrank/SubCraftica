@@ -73,7 +73,7 @@ internal static class InventoryResourceStacksCompatPatch
                 return baseCount;
             }
 
-            return baseCount > 0 ? baseCount + extraAmount : baseCount;
+            return baseCount + extraAmount;
         }
         catch (Exception ex)
         {

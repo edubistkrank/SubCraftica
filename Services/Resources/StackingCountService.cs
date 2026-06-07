@@ -44,7 +44,6 @@ internal sealed class StackingCountService
         {
             if (stackingDetection.Backend == StackingBackend.InventoryResourceStacks && container == Inventory.main?.container)
             {
-                InventoryResourceStacksCompatPatch.TryResyncMaterializedItems(container);
                 return InventoryResourceStacksCompatPatch.GetContainerCount(container, techType);
             }
 
