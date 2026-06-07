@@ -3,6 +3,7 @@ using System.Collections;
 using System.Reflection;
 using SubCraftica.Services.Resources;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace SubCraftica.Patches.Compat;
 
@@ -27,6 +28,10 @@ internal static class InventoryResourceStacksCompatPatch
     private static FieldInfo materialsField;
     private static FieldInfo isRefillingField;
     private static int lastResyncFrame = -1;
+    // Prevent rapid repeated materialization of the same techtype which can cause
+    // pickup/pop-up spam when players hold inputs or deconstruct repeatedly.
+    private static readonly Dictionary<TechType, float> lastMaterializeAt = new Dictionary<TechType, float>();
+    private const float MaterializeCooldownSeconds = 0.5f;
 
     internal static void Initialize()
     {
@@ -167,7 +172,25 @@ internal static class InventoryResourceStacksCompatPatch
                     continue;
                 }
 
-                materializeMethod.Invoke(null, new object[] { techType, 1 });
+                // Throttle materialization per-techType to avoid rapid repeated spawns
+                // that produce pickup sounds and UI popups when players hold down inputs.
+                if (lastMaterializeAt.TryGetValue(techType, out var lastAt))
+                {
+                    if (Time.unscaledTime - lastAt < MaterializeCooldownSeconds)
+                    {
+                        continue;
+                    }
+                }
+
+                try
+                {
+                    materializeMethod.Invoke(null, new object[] { techType, 1 });
+                    lastMaterializeAt[techType] = Time.unscaledTime;
+                }
+                catch (Exception ex)
+                {
+                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".Materialize", $"Inventory Resource Stacks materialize failed: {ex.Message}");
+                }
             }
         }
         catch (Exception ex)
