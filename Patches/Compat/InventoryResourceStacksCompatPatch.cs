@@ -54,6 +54,10 @@ internal static class InventoryResourceStacksCompatPatch
         {
             StorageCompatLogger.LogCompatibilityWarningOnce(InitializeWarningKey + ".Members", "Inventory Resource Stacks compatibility is missing one or more reflected members.");
         }
+        else
+        {
+            StorageCompatLogger.LogDetectedBackend(Services.Stacking.StackingBackend.InventoryResourceStacks);
+        }
     }
 
     internal static int GetContainerCount(ItemsContainer container, TechType techType)
@@ -128,6 +132,7 @@ internal static class InventoryResourceStacksCompatPatch
     {
         if (inventoryContainer == null || lastResyncFrame == Time.frameCount)
         {
+            StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".SkippedFrame", "Skipped resync because inventoryContainer is null or already resynced this frame.");
             return;
         }
 
@@ -178,14 +183,17 @@ internal static class InventoryResourceStacksCompatPatch
                 {
                     if (Time.unscaledTime - lastAt < MaterializeCooldownSeconds)
                     {
+                        StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".CooldownSkipped", $"Skipping materialize for {techType} due to cooldown (last at {lastAt}).");
                         continue;
                     }
                 }
 
                 try
                 {
+                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".MaterializeStart", $"Materializing 1 unit of {techType} at time {Time.unscaledTime}.");
                     materializeMethod.Invoke(null, new object[] { techType, 1 });
                     lastMaterializeAt[techType] = Time.unscaledTime;
+                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".MaterializeDone", $"Materialized {techType} successfully.");
                 }
                 catch (Exception ex)
                 {
