@@ -35,11 +35,6 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
-        if (autoCraftConsumeInProgress)
-        {
-            return;
-        }
-
         __result = Plugin.Services.NearbyStorage.DestroyInNearby(destroyTechType, 1, __instance.container);
         if (__result)
         {
@@ -52,13 +47,13 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
-        if (TryConsumeBufferedForConstruct(destroyTechType))
+        if (TryConsumeBufferedForAutoCraft(destroyTechType))
         {
             __result = true;
             return;
         }
 
-        if (autoCraftConsumeInProgress || !ConstructableConstructPatchContext.IsActive)
+        if (autoCraftConsumeInProgress || !IsCraftOrConstructContextActive())
         {
             return;
         }
@@ -147,7 +142,7 @@ internal static class InventoryDestroyItemPatch
             }
 
             BufferNetCrafted(plan.Consumed, plan.Crafted);
-            return TryConsumeBufferedForConstruct(techType);
+            return TryConsumeBufferedForAutoCraft(techType);
         }
         finally
         {
@@ -186,9 +181,9 @@ internal static class InventoryDestroyItemPatch
         }
     }
 
-    private static bool TryConsumeBufferedForConstruct(TechType techType)
+    private static bool TryConsumeBufferedForAutoCraft(TechType techType)
     {
-        if (!ConstructableConstructPatchContext.IsActive)
+        if (!IsCraftOrConstructContextActive())
         {
             return false;
         }
