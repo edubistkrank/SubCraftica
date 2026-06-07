@@ -183,17 +183,23 @@ internal static class InventoryResourceStacksCompatPatch
                 {
                     if (Time.unscaledTime - lastAt < MaterializeCooldownSeconds)
                     {
-                        StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".CooldownSkipped", $"Skipping materialize for {techType} due to cooldown (last at {lastAt}).");
+                        var msg = $"Skipping materialize for {techType} due to cooldown (last at {lastAt}).";
+                        StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".CooldownSkipped", msg);
+                        StorageCompatFileLogger.LogWarning(msg);
                         continue;
                     }
                 }
 
                 try
                 {
-                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".MaterializeStart", $"Materializing 1 unit of {techType} at time {Time.unscaledTime}.");
+                    var startMsg = $"Materializing 1 unit of {techType} at time {Time.unscaledTime}.";
+                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".MaterializeStart", startMsg);
+                    StorageCompatFileLogger.LogInfo(startMsg);
                     materializeMethod.Invoke(null, new object[] { techType, 1 });
                     lastMaterializeAt[techType] = Time.unscaledTime;
-                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".MaterializeDone", $"Materialized {techType} successfully.");
+                    var doneMsg = $"Materialized {techType} successfully.";
+                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".MaterializeDone", doneMsg);
+                    StorageCompatFileLogger.LogInfo(doneMsg);
                 }
                 catch (Exception ex)
                 {

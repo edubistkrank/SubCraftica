@@ -149,6 +149,7 @@
     <Compile Include="Services\Resources\StoragePreferredSurplusService.cs" />
     <Compile Include="Services\Resources\StackingCountService.cs" />
     <Compile Include="Services\Resources\StorageCompatLogger.cs" />
+    <Compile Include="Services\Resources\StorageCompatFileLogger.cs" />
     <Compile Include="Services\Resources\StorageExtractionExclusionService.cs" />
     <Compile Include="Services\Resources\StorageIdentifierResolver.cs" />
     <Compile Include="Services\Stacking\StackingBackend.cs" />
