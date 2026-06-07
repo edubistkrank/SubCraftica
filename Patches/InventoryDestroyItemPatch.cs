@@ -141,8 +141,13 @@ internal static class InventoryDestroyItemPatch
                 }
             }
 
-            BufferNetCrafted(plan.Consumed, plan.Crafted);
-            return TryConsumeBufferedForAutoCraft(techType);
+            if (ConstructableConstructPatchContext.IsActive)
+            {
+                BufferNetCrafted(plan.Consumed, plan.Crafted);
+                return TryConsumeBufferedForAutoCraft(techType);
+            }
+
+            return ConsumeAutoCraftResultImmediately(plan.Consumed, plan.Crafted, techType);
         }
         finally
         {
@@ -183,7 +188,7 @@ internal static class InventoryDestroyItemPatch
 
     private static bool TryConsumeBufferedForAutoCraft(TechType techType)
     {
-        if (!IsCraftOrConstructContextActive())
+        if (!ConstructableConstructPatchContext.IsActive)
         {
             return false;
         }
@@ -201,6 +206,18 @@ internal static class InventoryDestroyItemPatch
         else
         {
             constructBufferedOutputs[techType] = buffered;
+        }
+
+        return true;
+    }
+
+    private static bool ConsumeAutoCraftResultImmediately(Dictionary<TechType, int> consumed, Dictionary<TechType, int> crafted, TechType requestedType)
+    {
+        var used = consumed.TryGetValue(requestedType, out var consumedAmount) ? consumedAmount : 0;
+        var produced = crafted.TryGetValue(requestedType, out var craftedAmount) ? craftedAmount : 0;
+        if (produced <= used)
+        {
+            return false;
         }
 
         return true;
