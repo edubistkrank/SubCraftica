@@ -10,6 +10,12 @@ internal sealed class PlannerValidationService
         }
 
         var ingredients = TechData.GetIngredients(techType);
-        return ingredients != null;
+        if (ingredients != null)
+        {
+            return true;
+        }
+
+        var linkedItems = TechData.GetLinkedItems(techType);
+        return linkedItems != null && linkedItems.Count > 0;
     }
 }

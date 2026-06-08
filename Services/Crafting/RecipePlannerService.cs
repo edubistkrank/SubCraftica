@@ -86,15 +86,21 @@ internal sealed class RecipePlannerService
         }
 
         var ingredients = TechData.GetIngredients(techType);
-        if (ingredients == null)
+        if (ingredients != null)
         {
-            path.Remove(techType);
-            return false;
+            foreach (var ingredient in ingredients)
+            {
+                if (!EnsureAndConsume(ingredient.techType, ingredient.amount, state, depth + 1, path))
+                {
+                    path.Remove(techType);
+                    return false;
+                }
+            }
         }
-
-        foreach (var ingredient in ingredients)
+        else
         {
-            if (!EnsureAndConsume(ingredient.techType, ingredient.amount, state, depth + 1, path))
+            var linkedOnlyItems = TechData.GetLinkedItems(techType);
+            if (linkedOnlyItems == null || linkedOnlyItems.Count == 0)
             {
                 path.Remove(techType);
                 return false;

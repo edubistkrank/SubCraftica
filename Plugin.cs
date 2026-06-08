@@ -48,6 +48,10 @@ public sealed class Plugin : BaseUnityPlugin
         var failedPatchCount = PatchSafely(harmony);
 
         StorageCompatLogger.LogDetectedBackend(Services.StackingDetection.Backend);
+        if (Services.PrototypeSubCompat.IsInstalled)
+        {
+            Log.LogInfo("[Compat] Prototype Sub detected. Enabling extended GhostCrafter recipe planning support.");
+        }
         if (failedPatchCount > 0)
         {
             Log.LogWarning($"{PluginInfo.Name}: {failedPatchCount} patch(es) failed to apply. Review earlier log entries for details.");

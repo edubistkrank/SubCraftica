@@ -19,6 +19,7 @@ internal sealed class ModServices
         Synchronization = new CraftSynchronizationService();
         Math = new CraftingMathService(config);
         DefabricatorCompat = new DefabricatorCompatService();
+        PrototypeSubCompat = new PrototypeSubCompatService();
         PowerSaverCompat = new PowerSaverCompatService();
         InferiusQoLCompat = new InferiusQoLCompatService();
         StackingCount = new StackingCountService(StackingDetection);
@@ -44,6 +45,7 @@ internal sealed class ModServices
     public CraftSynchronizationService Synchronization { get; }
     public CraftingMathService Math { get; }
     public DefabricatorCompatService DefabricatorCompat { get; }
+    public PrototypeSubCompatService PrototypeSubCompat { get; }
     public PowerSaverCompatService PowerSaverCompat { get; }
     public InferiusQoLCompatService InferiusQoLCompat { get; }
     public StackingCountService StackingCount { get; }

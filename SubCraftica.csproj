@@ -98,6 +98,7 @@
   <ItemGroup>
     <Compile Include="Patches\Compat\InventoryResourceStacksCompatPatch.cs" />
     <Compile Include="Patches\Compat\MadesRedoInventoryStackingCompatPatch.cs" />
+    <Compile Include="Patches\Compat\PrototypeSubGhostCrafterCompatPatch.cs" />
     <Compile Include="Patches\Compat\VisibleLockerInteriorCompatPatch.cs" />
     <Compile Include="Patches\ConstructableConstructPatch.cs" />
     <Compile Include="Patches\ConstructableGetConstructIntervalPatch.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="Services\Compat\DefabricatorCompatService.cs" />
     <Compile Include="Services\Compat\InferiusQoLCompatService.cs" />
     <Compile Include="Services\Compat\PowerSaverCompatService.cs" />
+    <Compile Include="Services\Compat\PrototypeSubCompatService.cs" />
     <Compile Include="Services\Composition\ModServices.cs" />
     <Compile Include="Services\Configuration\MissingIngredientColorPresets.cs" />
     <Compile Include="Services\Configuration\CreativeModeHelper.cs" />
