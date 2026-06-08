@@ -97,8 +97,14 @@ internal static class GhostCrafterCraftingEndPatch
         var logic = Traverse.Create(__instance).Field<CrafterLogic>("logic").Value;
         if (logic != null)
         {
+            var recipe = Traverse.Create(logic).Field<object>("recipe").Value;
+            SubCrafticaLogger.LogDebug($"[GhostCrafterCraftingEndPatch.Postfix] Logic exists, recipe={recipe}");
             SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] Calling logic.TryPickup()");
             logic.TryPickup();
+        }
+        else
+        {
+            SubCrafticaLogger.LogWarning("[GhostCrafterCraftingEndPatch.Postfix] Logic is null!");
         }
 
         var craftingMode = Plugin.Services.Config.CraftingMode.Value;
@@ -158,6 +164,10 @@ internal static class GhostCrafterCraftingEndPatch
                 SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] Calling logic.TryPickup()");
                 logic.TryPickup();
             }
+            else
+            {
+                SubCrafticaLogger.LogWarning("[HandlePerItemQueueEnd] Logic is null during hasCrafted branch!");
+            }
 
             waitFrames = 0;
             while (Plugin.Services.QueueCoordinator.HasPendingPickupOperations && waitFrames < 60)
@@ -196,6 +206,10 @@ internal static class GhostCrafterCraftingEndPatch
                 yield return null;
             }
             SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Item pickup complete after {retryFrames} retries");
+        }
+        else
+        {
+            SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] No crafted item detected, skipping pickup loop");
         }
 
         if (Plugin.Services.QueueCoordinator.ConsumeStopQueueContinuationRequested())
@@ -238,13 +252,35 @@ internal static class GhostCrafterCraftingEndPatch
 
         try
         {
+            // Try using reflection on Crafter.HasCraftedItem first (for vanilla GhostCrafter)
             var result = CrafterHasCraftedItemMethod?.Invoke(crafter, null);
-            return result is bool has && has;
+            if (result is bool has && has)
+            {
+                return true;
+            }
         }
         catch
         {
-            return false;
+            // Silently continue to fallback
         }
+
+        // Fallback: check via logic.recipe (works for AlienFabricator and other custom crafter types)
+        try
+        {
+            var logic = Traverse.Create(crafter).Field<CrafterLogic>("logic").Value;
+            if (logic != null)
+            {
+                var recipe = Traverse.Create(logic).Field<object>("recipe").Value;
+                SubCrafticaLogger.LogDebug($"[HasCraftedItem] Fallback check: logic exists, recipe={recipe}");
+                return recipe != null;
+            }
+        }
+        catch (Exception ex)
+        {
+            SubCrafticaLogger.LogDebug($"[HasCraftedItem] Fallback check failed: {ex.Message}");
+        }
+
+        return false;
     }
 
     private static void TrySetCraftingMenuLocked(GhostCrafter crafter, bool locked)
