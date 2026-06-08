@@ -149,6 +149,7 @@
     <Compile Include="Services\Crafting\RecipeDataOverrideService.cs" />
     <Compile Include="Services\Crafting\RecipePlannerService.cs" />
     <Compile Include="Services\Localization\ModText.cs" />
+    <Compile Include="Services\Logging\SubCrafticaLogger.cs" />
     <Compile Include="Services\Resources\NearbyStorageService.cs" />
     <Compile Include="Services\Resources\StoragePreferredSurplusService.cs" />
     <Compile Include="Services\Resources\StackingCountService.cs" />

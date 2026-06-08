@@ -8,6 +8,7 @@ using SubCraftica.Patches;
 using SubCraftica.Services.Composition;
 using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Localization;
+using SubCraftica.Services.Logging;
 using SubCraftica.Services.Resources;
 using SubCraftica.Services.Stacking;
 using SubCraftica.Services.UI;
@@ -34,6 +35,7 @@ public sealed class Plugin : BaseUnityPlugin
     private void Awake()
     {
         Log = Logger;
+        SubCrafticaLogger.Initialize();
 
         var config = ModConfig.Bind(Config);
         Services = new ModServices(config);
@@ -51,6 +53,7 @@ public sealed class Plugin : BaseUnityPlugin
         if (Services.PrototypeSubCompat.IsInstalled)
         {
             Log.LogInfo("[Compat] Prototype Sub detected. Enabling extended GhostCrafter recipe planning support.");
+            SubCrafticaLogger.LogInfo("[Compat] Prototype Sub detected. Enabling extended GhostCrafter recipe planning support.");
         }
         if (failedPatchCount > 0)
         {
@@ -58,6 +61,7 @@ public sealed class Plugin : BaseUnityPlugin
         }
 
         Log.LogInfo($"{PluginInfo.Name} {PluginInfo.Version} loaded. Stacking backend: {Services.StackingDetection.Backend}");
+        SubCrafticaLogger.LogInfo($"{PluginInfo.Name} {PluginInfo.Version} loaded. Stacking backend: {Services.StackingDetection.Backend}");
     }
 
     private static int PatchSafely(Harmony harmonyInstance)

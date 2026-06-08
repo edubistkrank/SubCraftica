@@ -4,6 +4,7 @@ using SubCraftica.Services.Composition;
 using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Crafting;
 using SubCraftica.Services.Localization;
+using SubCraftica.Services.Logging;
 
 namespace SubCraftica.Patches;
 
@@ -20,48 +21,63 @@ internal static class GhostCrafterCraftPatch
     {
         _didEnterCraft = false;
 
+        var instanceType = __instance?.GetType().FullName ?? "null";
+        SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Called for instance type={instanceType}, techType={techType}");
+
         if (Services == null)
         {
+            SubCrafticaLogger.LogWarning("[GhostCrafterCraftPatch.Prefix] Services is null, allowing vanilla craft");
             return true;
         }
 
         if (!Services.Synchronization.TryEnterCraft())
         {
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] Synchronization failed - craft already running");
             ErrorMessage.AddWarning(ModText.Get(ModText.CraftAlreadyRunning));
             return false;
         }
 
         _didEnterCraft = true;
         Services.Runtime.SetLastTechType(techType);
+        SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Entered craft synchronization for techType={techType}");
 
         if (!Services.Queue.TryDequeueForTechType(techType, out var request))
         {
             // No queued request: vanilla single craft, just track energy
+            SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] No queued request - vanilla single craft");
             Services.CraftRuntimeState.SetRequiredEnergy(techType, Services.Energy.GetRequiredEnergy(techType, 1));
             Services.RecipeOverride.Restore(techType);
             return true;
         }
 
+        SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Dequeued request: amount={request.Amount}, totalAmount={request.TotalAmount}");
         var craftingMode = Services.Config.CraftingMode.Value;
 
-        return craftingMode == ModConfig.CraftingModePerItem
+        var result = craftingMode == ModConfig.CraftingModePerItem
             ? HandlePerItemCraft(__instance, techType, request)
             : HandleBatchOrInstantCraft(__instance, techType, request, craftingMode);
+
+        SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Craft handling returned {result}");
+        return result;
     }
 
     // --- Per-item mode: always crafts 1, requeues remainder ---
 
     private static bool HandlePerItemCraft(GhostCrafter instance, TechType techType, CraftingRequest request)
     {
+        SubCrafticaLogger.LogDebug($"[HandlePerItemCraft] Starting per-item craft: amount={request.Amount}, totalAmount={request.TotalAmount}");
+
         var totalAmount = request.TotalAmount;
         var remainder = request.Amount - 1;
 
         if (remainder > 0)
         {
+            SubCrafticaLogger.LogDebug($"[HandlePerItemCraft] Requeuing remainder: {remainder}");
             Services.Queue.TryEnqueueFront(new CraftingRequest(techType, remainder, totalAmount), Services.Config.MaxQueueSize.Value);
         }
 
         var crafted = totalAmount - remainder;
+        SubCrafticaLogger.LogDebug($"[HandlePerItemCraft] Notifying progress: crafted={crafted}/{totalAmount}");
         Services.QueueFeedback.NotifyCraftProgress(techType, crafted, totalAmount);
         Services.Runtime.SetLastPerItemFinished(techType);
 
@@ -70,6 +86,7 @@ internal static class GhostCrafterCraftPatch
 
         if (Services.Config.CreativeMode.Value)
         {
+            SubCrafticaLogger.LogDebug("[HandlePerItemCraft] Creative mode enabled - zero energy");
             Services.RecipeOverride.ApplyAmountOverride(techType, 1);
             Services.CraftRuntimeState.SetRequiredEnergy(techType, 0f);
             return true;
@@ -77,6 +94,7 @@ internal static class GhostCrafterCraftPatch
 
         if (isDefabRecycle)
         {
+            SubCrafticaLogger.LogDebug("[HandlePerItemCraft] Defab recycle active");
             Services.RecipeOverride.Restore(techType);
             Services.CraftRuntimeState.SetRequiredEnergy(techType, Services.Energy.GetRequiredEnergy(techType, 1));
             return true;
@@ -86,6 +104,7 @@ internal static class GhostCrafterCraftPatch
         var plan = Services.RecipePlanner.BuildPlan(techType, 1);
         if (!plan.Success)
         {
+            SubCrafticaLogger.LogWarning($"[HandlePerItemCraft] Plan failed for techType={techType}");
             HandleMissingIngredientsFailure(techType, ModConfig.CraftingModePerItem);
             return false;
         }
@@ -93,10 +112,12 @@ internal static class GhostCrafterCraftPatch
         var requiredEnergy = Services.Energy.GetRequiredEnergy(techType, plan.Crafted);
         if (!Services.Energy.HasEnoughEnergy(powerRelay, techType, requiredEnergy))
         {
+            SubCrafticaLogger.LogWarning($"[HandlePerItemCraft] Not enough energy: required={requiredEnergy}");
             HandleNotEnoughPowerFailure(techType, ModConfig.CraftingModePerItem);
             return false;
         }
 
+        SubCrafticaLogger.LogDebug($"[HandlePerItemCraft] Success - energy={requiredEnergy}");
         Services.RecipeOverride.ApplyAmountOverride(techType, 1);
         Services.CraftRuntimeState.SetRequiredEnergy(techType, requiredEnergy);
         return true;
@@ -233,12 +254,22 @@ internal static class GhostCrafterCraftPatch
     [HarmonyFinalizer]
     private static Exception Finalizer(Exception __exception, TechType techType)
     {
+        if (__exception != null)
+        {
+            SubCrafticaLogger.LogError($"[GhostCrafterCraftPatch.Finalizer] Exception: {__exception.GetType().Name} - {__exception.Message}\n{__exception.StackTrace}");
+        }
+        else
+        {
+            SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Finalizer] Success for techType={techType}");
+        }
+
         Services?.RecipeOverride.Restore(techType);
         Services?.Runtime.Clear(techType);
         Services?.CraftRuntimeState.Clear(techType);
 
         if (_didEnterCraft)
         {
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Finalizer] Exiting craft synchronization");
             Services?.Synchronization.ExitCraft();
             _didEnterCraft = false;
         }
