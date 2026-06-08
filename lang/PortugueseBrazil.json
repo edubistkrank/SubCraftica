@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: opções restauradas para os valores padrão.",
   "SubCraftica.StorageMode_Disabled": "Desativado",
   "SubCraftica.StorageMode_Nearby": "Próximos",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Cápsula",
   "SubCraftica.StorageMode_AllLoaded": "Todos (sem alcance)",
   "SubCraftica.CraftingMode_PerItem": "Por item",
   "SubCraftica.CraftingMode_Batch": "Lote",
@@ -64,12 +64,11 @@
   "SubCraftica.Tooltip_AdjustAmount": "Ajustar quantidade",
   "SubCraftica.Tooltip_Amount": "Fabricar",
   "SubCraftica.Tooltip_Total": "Total",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Opt_CreativeMode": "Modo criativo",
+  "SubCraftica.OptDesc_CreativeMode": "Somente para o modo Creative Crafting. Não concede invulnerabilidade e não altera o restante da sobrevivência (fome, sede, oxigênio, vida etc.).\n\nA fabricação ignora a disponibilidade de ingredientes no inventário e nos armazenamentos.\nTodas as receitas ficam desbloqueadas enquanto este modo estiver ativo.\nA fabricação é sempre instantânea neste modo.\nO custo de energia fica sempre desativado neste modo, independentemente das configurações de energia do SubCraftica.\n\nAviso: isso pode quebrar a experiência de jogo pretendida.\n\n<size=9><color=#FFAC09FF><i>Está pronto, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Tem certeza?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Desativado",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Bora lá!",
+  "SubCraftica.Tooltip_Recycle": "Reciclar",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: fila parada.</color>"
 }
-
-

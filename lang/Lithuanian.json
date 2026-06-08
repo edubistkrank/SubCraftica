@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: parinktys atkurtos į numatytąsias reikšmes.",
   "SubCraftica.StorageMode_Disabled": "Išjungta",
   "SubCraftica.StorageMode_Nearby": "Netoliese",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Bazė/Kapsulė",
   "SubCraftica.StorageMode_AllLoaded": "Visi (be diapazono)",
   "SubCraftica.CraftingMode_PerItem": "Vienai prekei",
   "SubCraftica.CraftingMode_Batch": "Partija",
@@ -64,12 +64,11 @@
   "SubCraftica.Tooltip_AdjustAmount": "Sureguliuokite sumą",
   "SubCraftica.Tooltip_Amount": "Amatas",
   "SubCraftica.Tooltip_Total": "Iš viso",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Opt_CreativeMode": "Kūrybinis režimas",
+  "SubCraftica.OptDesc_CreativeMode": "Tik Creative Crafting režimui. Jis nesuteikia nepažeidžiamumo ir nekeičia kitų išlikimo elementų (alkio, troškulio, deguonies, sveikatos ir t. t.).\n\nGamyba ignoruoja ingredientų prieinamumą inventoriuje ir saugyklose.\nVisi receptai atrakinti, kol šis režimas įjungtas.\nŠiame režime gamyba visada momentinė.\nEnergijos kaina šiame režime visada išjungta, nepriklausomai nuo jūsų SubCraftica energijos nustatymų.\n\nĮspėjimas: tai gali sugadinti numatytą žaidimo patirtį.\n\n<size=9><color=#FFAC09FF><i>Ar pasiruošęs, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Ar tikrai?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Išjungta",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Pirmyn!",
+  "SubCraftica.Tooltip_Recycle": "Perdirbti",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: eilė sustabdyta.</color>"
 }
-
-

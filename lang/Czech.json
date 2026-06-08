@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: možnosti obnoveny na výchozí hodnoty.",
   "SubCraftica.StorageMode_Disabled": "Zakázáno",
   "SubCraftica.StorageMode_Nearby": "Nedaleko",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Základna/Modul",
   "SubCraftica.StorageMode_AllLoaded": "Vše (bez rozsahu)",
   "SubCraftica.CraftingMode_PerItem": "Za položku",
   "SubCraftica.CraftingMode_Batch": "Dávka",
@@ -63,13 +63,12 @@
   "SubCraftica.CraftingTooltipMode_Advanced": "Moderní",
   "SubCraftica.Tooltip_AdjustAmount": "Upravte množství",
   "SubCraftica.Tooltip_Amount": "Řemeslo",
-  "SubCraftica.Tooltip_Total": "Celkový",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Tooltip_Total": "Celkem",
+  "SubCraftica.Opt_CreativeMode": "Kreativní režim",
+  "SubCraftica.OptDesc_CreativeMode": "Pouze pro režim Creative Crafting. Neuděluje nesmrtelnost a nemění zbytek survivalu (hlad, žízeň, kyslík, zdraví atd.).\n\nVýroba ignoruje dostupnost surovin v inventáři a úložištích.\nVšechny recepty jsou při zapnutí tohoto režimu odemčené.\nVýroba je v tomto režimu vždy okamžitá.\nCena energie je v tomto režimu vždy vypnutá bez ohledu na vaše nastavení energie v SubCraftica.\n\nUpozornění: může to narušit zamýšlený herní zážitek.\n\n<size=9><color=#FFAC09FF><i>Jste připraven, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Jste si jistí?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Vypnuto",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Jdeme na to!",
+  "SubCraftica.Tooltip_Recycle": "Recyklovat",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: fronta zastavena.</color>"
 }
-
-

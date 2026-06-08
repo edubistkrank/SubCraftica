@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: opties teruggezet naar standaardwaarden.",
   "SubCraftica.StorageMode_Disabled": "Uitgeschakeld",
   "SubCraftica.StorageMode_Nearby": "Nabij",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Basis/Pod",
   "SubCraftica.StorageMode_AllLoaded": "Alles (zonder bereik)",
   "SubCraftica.CraftingMode_PerItem": "Per item",
   "SubCraftica.CraftingMode_Batch": "Batch",
@@ -64,12 +64,11 @@
   "SubCraftica.Tooltip_AdjustAmount": "Aantal aanpassen",
   "SubCraftica.Tooltip_Amount": "Fabriceren",
   "SubCraftica.Tooltip_Total": "Totaal",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Opt_CreativeMode": "Creatieve modus",
+  "SubCraftica.OptDesc_CreativeMode": "Alleen voor Creative Crafting-modus. Het geeft geen onkwetsbaarheid en verandert de rest van survival niet (honger, dorst, zuurstof, gezondheid, enz.).\n\nCraften negeert de beschikbaarheid van ingrediënten in inventaris en opslag.\nAlle recepten zijn ontgrendeld zolang deze modus actief is.\nCraften is in deze modus altijd direct.\nEnergiekosten zijn in deze modus altijd uitgeschakeld, ongeacht je SubCraftica-energie-instellingen.\n\nWaarschuwing: dit kan de bedoelde spelervaring verstoren.\n\n<size=9><color=#FFAC09FF><i>Ben je er klaar voor, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Weet je het zeker?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Uitgeschakeld",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Aan de slag!",
+  "SubCraftica.Tooltip_Recycle": "Recyclen",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: wachtrij gestopt.</color>"
 }
-
-

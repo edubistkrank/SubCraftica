@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: przywrócono domyślne wartości opcji.",
   "SubCraftica.StorageMode_Disabled": "Wyłączone",
   "SubCraftica.StorageMode_Nearby": "Pobliskie",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Baza/Kapsuła",
   "SubCraftica.StorageMode_AllLoaded": "Wszystkie (bez zasięgu)",
   "SubCraftica.CraftingMode_PerItem": "Na sztukę",
   "SubCraftica.CraftingMode_Batch": "Partia",
@@ -63,13 +63,12 @@
   "SubCraftica.CraftingTooltipMode_Advanced": "Zaawansowany",
   "SubCraftica.Tooltip_AdjustAmount": "Dostosuj ilość",
   "SubCraftica.Tooltip_Amount": "Wytwórz",
-  "SubCraftica.Tooltip_Total": "Łącznie",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Tooltip_Total": "Razem",
+  "SubCraftica.Opt_CreativeMode": "Tryb kreatywny",
+  "SubCraftica.OptDesc_CreativeMode": "Tylko dla trybu Creative Crafting. Nie daje nieśmiertelności i nie zmienia pozostałych elementów survivalu (głód, pragnienie, tlen, zdrowie itd.).\n\nWytwarzanie ignoruje dostępność składników w ekwipunku i magazynach.\nWszystkie receptury są odblokowane, gdy ten tryb jest aktywny.\nW tym trybie wytwarzanie jest zawsze natychmiastowe.\nKoszt energii w tym trybie jest zawsze wyłączony, niezależnie od ustawień energii SubCraftica.\n\nOstrzeżenie: to może zepsuć zamierzone doświadczenie gry.\n\n<size=9><color=#FFAC09FF><i>Jesteś gotów, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Czy na pewno?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Wyłączony",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "No to jazda!",
+  "SubCraftica.Tooltip_Recycle": "Recykling",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: kolejka zatrzymana.</color>"
 }
-
-

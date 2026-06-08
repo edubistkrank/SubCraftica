@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: опциите са възстановени до стойностите по подразбиране.",
   "SubCraftica.StorageMode_Disabled": "Забранено",
   "SubCraftica.StorageMode_Nearby": "Наблизо",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "База/Капсула",
   "SubCraftica.StorageMode_AllLoaded": "Всички (без диапазон)",
   "SubCraftica.CraftingMode_PerItem": "По артикул",
   "SubCraftica.CraftingMode_Batch": "Партида",
@@ -64,12 +64,11 @@
   "SubCraftica.Tooltip_AdjustAmount": "Коригирайте сумата",
   "SubCraftica.Tooltip_Amount": "Занаят",
   "SubCraftica.Tooltip_Total": "Общо",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Opt_CreativeMode": "Творчески режим",
+  "SubCraftica.OptDesc_CreativeMode": "Само за режим Creative Crafting. Не дава неуязвимост и не променя останалото оцеляване (глад, жажда, кислород, здраве и др.).\n\nИзработката игнорира наличността на съставки в инвентара и складовете.\nВсички рецепти са отключени, докато този режим е активен.\nИзработката винаги е мигновена в този режим.\nРазходът на енергия винаги е изключен в този режим, независимо от настройките за енергия на SubCraftica.\n\nПредупреждение: това може да наруши предвиденото игрово изживяване.\n\n<size=9><color=#FFAC09FF><i>Готов ли си, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Сигурни ли сте?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Изключен",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Да започваме!",
+  "SubCraftica.Tooltip_Recycle": "Рециклиране",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: опашката е спряна.</color>"
 }
-
-

@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: az opciók visszaállítva az alapértelmezett értékekre.",
   "SubCraftica.StorageMode_Disabled": "Letiltva",
   "SubCraftica.StorageMode_Nearby": "Közeli",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Bázis/Kabin",
   "SubCraftica.StorageMode_AllLoaded": "Mind (nincs tartomány)",
   "SubCraftica.CraftingMode_PerItem": "Tételenként",
   "SubCraftica.CraftingMode_Batch": "Batch",
@@ -63,13 +63,12 @@
   "SubCraftica.CraftingTooltipMode_Advanced": "Fejlett",
   "SubCraftica.Tooltip_AdjustAmount": "Állítsa be az összeget",
   "SubCraftica.Tooltip_Amount": "Hajó",
-  "SubCraftica.Tooltip_Total": "Teljes",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Tooltip_Total": "Összesen",
+  "SubCraftica.Opt_CreativeMode": "Kreatív mód",
+  "SubCraftica.OptDesc_CreativeMode": "Csak Creative Crafting módhoz. Nem ad sebezhetetlenséget, és nem módosítja a túlélés többi részét (éhség, szomjúság, oxigén, életerő stb.).\n\nA gyártás figyelmen kívül hagyja az alapanyagok elérhetőségét a készletben és tárolókban.\nEbben a módban minden recept feloldódik.\nA gyártás ebben a módban mindig azonnali.\nAz energiafogyasztás ebben a módban mindig ki van kapcsolva, függetlenül a SubCraftica energia-beállításaitól.\n\nFigyelem: ez tönkreteheti a tervezett játékélményt.\n\n<size=9><color=#FFAC09FF><i>Készen állsz, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Biztos benne?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Kikapcsolva",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Gyerünk!",
+  "SubCraftica.Tooltip_Recycle": "Újrahasznosítás",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: sor leállítva.</color>"
 }
-
-

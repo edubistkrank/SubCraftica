@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: opcijas ir atjaunotas uz noklusējuma vērtībām.",
   "SubCraftica.StorageMode_Disabled": "Atspējots",
   "SubCraftica.StorageMode_Nearby": "Tuvumā",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Bāze/Kapsula",
   "SubCraftica.StorageMode_AllLoaded": "Visi (bez diapazona)",
   "SubCraftica.CraftingMode_PerItem": "Katrai vienībai",
   "SubCraftica.CraftingMode_Batch": "Partija",
@@ -64,12 +64,11 @@
   "SubCraftica.Tooltip_AdjustAmount": "Pielāgojiet summu",
   "SubCraftica.Tooltip_Amount": "Amatniecība",
   "SubCraftica.Tooltip_Total": "Kopā",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Opt_CreativeMode": "Radošais režīms",
+  "SubCraftica.OptDesc_CreativeMode": "Tikai Creative Crafting režīmam. Tas nepiešķir neievainojamību un nemaina pārējo izdzīvošanu (izsalkums, slāpes, skābeklis, veselība u.c.).\n\nVeidošana ignorē sastāvdaļu pieejamību inventārā un krātuvēs.\nVisas receptes ir atbloķētas, kamēr šis režīms ir ieslēgts.\nŠajā režīmā veidošana vienmēr ir tūlītēja.\nEnerģijas izmaksas šajā režīmā vienmēr ir izslēgtas neatkarīgi no SubCraftica enerģijas iestatījumiem.\n\nBrīdinājums: tas var sabojāt iecerēto spēles pieredzi.\n\n<size=9><color=#FFAC09FF><i>Vai esi gatavs, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Vai esat pārliecināts?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Atspējots",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Aiziet!",
+  "SubCraftica.Tooltip_Recycle": "Pārstrādāt",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: rinda apturēta.</color>"
 }
-
-

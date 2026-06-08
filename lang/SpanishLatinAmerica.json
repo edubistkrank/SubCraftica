@@ -2,7 +2,7 @@
   "SubCraftica.CraftInProgress": "SubCraftica: espera hasta que termine la nave actual.",
   "SubCraftica.CraftAlreadyRunning": "SubCraftica: ya se está procesando una solicitud de artesanía.",
   "SubCraftica.QueueQueued": "SubCraftica: en cola +{0} {1}.",
-  "SubCraftica.QueueProgress": "SubCrásica: {0} ({1}/{2})",
+  "SubCraftica.QueueProgress": "SubCraftica: {0} ({1}/{2})",
   "SubCraftica.QueueFull": "SubCraftica: la cola está llena ({0}).",
   "SubCraftica.QueueMismatch": "SubCraftica: la cola espera {0}, la solicitud actual es {1}.",
   "SubCraftica.QueueCompleted": "<color=#94DE00FF>SubCraftica: cola completada.</color>",
@@ -54,7 +54,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: opciones restauradas a los valores predeterminados.",
   "SubCraftica.StorageMode_Disabled": "Desactivado",
   "SubCraftica.StorageMode_Nearby": "Cercano",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Cápsula",
   "SubCraftica.StorageMode_AllLoaded": "Todo (sin rango)",
   "SubCraftica.CraftingMode_PerItem": "Por artículo",
   "SubCraftica.CraftingMode_Batch": "Lote",
@@ -66,11 +66,9 @@
   "SubCraftica.Tooltip_Amount": "Artesanía",
   "SubCraftica.Tooltip_Total": "Total",
   "SubCraftica.Opt_CreativeMode": "Modo creativo",
-  "SubCraftica.OptDesc_CreativeMode": "Solo Modo de fabricación creativo. No otorga invulnerabilidad ni modifica el resto de la supervivencia (hambre, sed, oxígeno, salud, etc.).\n\nLa fabricación ignora la disponibilidad de ingredientes en inventario y almacenamientos.\nTodas las recetas se desbloquean mientras este modo esté activo.\nLa fabricación siempre es instantánea en este modo.\nEl coste de energía siempre queda desactivado en este modo, independientemente de la opción de energía de SubCraftica.\n\nAviso: esto puede romper la experiencia de juego prevista.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptDesc_CreativeMode": "Solo para el modo de Crafteo Creativo. No otorga invulnerabilidad ni modifica el resto de la supervivencia (hambre, sed, oxígeno, salud, etc.).\n\nEl crafteo ignora la disponibilidad de ingredientes en inventario y almacenes.\nTodas las recetas se desbloquean mientras este modo está activado.\nEl crafteo es siempre instantáneo en este modo.\nEl costo de energía está siempre desactivado en este modo, independientemente de tu configuración de energía de SubCraftica.\n\nAdvertencia: esto puede romper la experiencia de juego prevista.\n\n<size=9><color=#FFAC09FF><i>¿Estás listo mr. hardkopy?</i></color></size>",
   "SubCraftica.OptGroup_AreYouSure": "¿Estás seguro?",
   "SubCraftica.Opt_CreativeMode_Disabled": "Desactivado",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "¡Vamos!",
   "SubCraftica.Tooltip_Recycle": "Reciclar"
 }
-
-

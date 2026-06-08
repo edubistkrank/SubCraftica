@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: indstillinger gendannet til standardværdier.",
   "SubCraftica.StorageMode_Disabled": "Handicappet",
   "SubCraftica.StorageMode_Nearby": "I nærheden",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Base/Kapsel",
   "SubCraftica.StorageMode_AllLoaded": "Alle (ingen rækkevidde)",
   "SubCraftica.CraftingMode_PerItem": "Per vare",
   "SubCraftica.CraftingMode_Batch": "Batch",
@@ -64,12 +64,11 @@
   "SubCraftica.Tooltip_AdjustAmount": "Juster mængden",
   "SubCraftica.Tooltip_Amount": "Håndværk",
   "SubCraftica.Tooltip_Total": "I alt",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Opt_CreativeMode": "Kreativ tilstand",
+  "SubCraftica.OptDesc_CreativeMode": "Kun til Creative Crafting-tilstand. Det giver ikke usårlighed og ændrer ikke resten af survival (sult, tørst, ilt, helbred osv.).\n\nCrafting ignorerer ingredienser i inventar og lagre.\nAlle opskrifter låses op, mens denne tilstand er aktiveret.\nCrafting er altid øjeblikkelig i denne tilstand.\nEnergiforbrug er altid deaktiveret i denne tilstand, uanset dine SubCraftica-energiindstillinger.\n\nAdvarsel: dette kan ødelægge den tilsigtede spiloplevelse.\n\n<size=9><color=#FFAC09FF><i>Er du klar, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Er du sikker?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Deaktiveret",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Lad os gå!",
+  "SubCraftica.Tooltip_Recycle": "Genbrug",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: kø stoppet.</color>"
 }
-
-

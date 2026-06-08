@@ -2,7 +2,7 @@
   "SubCraftica.CraftInProgress": "SubCraftica: đợi cho đến khi nghề hiện tại kết thúc.",
   "SubCraftica.CraftAlreadyRunning": "SubCraftica: yêu cầu thủ công đã được xử lý.",
   "SubCraftica.QueueQueued": "SubCraftica: đã xếp hàng +{0} {1}.",
-  "SubCraftica.QueueProgress": "Chế tạo phụ: {0} ({1}/{2})",
+  "SubCraftica.QueueProgress": "SubCraftica: {0} ({1}/{2})",
   "SubCraftica.QueueFull": "SubCraftica: hàng đợi đã đầy ({0}).",
   "SubCraftica.QueueMismatch": "SubCraftica: hàng đợi mong đợi {0}, yêu cầu hiện tại là {1}.",
   "SubCraftica.QueueCompleted": "<color=#94DE00FF>SubCraftica: hàng đợi đã hoàn thành.</color>",
@@ -53,7 +53,7 @@
   "SubCraftica.Opt_ResetToDefaultsDone": "SubCraftica: các tùy chọn được khôi phục về giá trị mặc định.",
   "SubCraftica.StorageMode_Disabled": "Tàn tật",
   "SubCraftica.StorageMode_Nearby": "lân cận",
-  "SubCraftica.StorageMode_InsideBasePod": "Base/Pod",
+  "SubCraftica.StorageMode_InsideBasePod": "Căn cứ/Khoang",
   "SubCraftica.StorageMode_AllLoaded": "Tất cả (không có phạm vi)",
   "SubCraftica.CraftingMode_PerItem": "Mỗi mục",
   "SubCraftica.CraftingMode_Batch": "Lô",
@@ -63,13 +63,12 @@
   "SubCraftica.CraftingTooltipMode_Advanced": "Trình độ cao",
   "SubCraftica.Tooltip_AdjustAmount": "Điều chỉnh số tiền",
   "SubCraftica.Tooltip_Amount": "thủ công",
-  "SubCraftica.Tooltip_Total": "Tổng cộng",
-  "SubCraftica.Opt_CreativeMode": "Creative mode",
-  "SubCraftica.OptDesc_CreativeMode": "Creative Crafting Mode only. It does not grant invulnerability and does not modify the rest of survival (hunger, thirst, oxygen, health, etc.).\n\nCrafting ignores ingredient availability in inventory and storages.\nAll recipes are unlocked while this mode is enabled.\nCrafting is always instant in this mode.\nEnergy cost is always disabled in this mode, regardless of your SubCraftica energy settings.\n\nWarning: this can break the intended game experience.\n\n<size=18><color=#FFAC09FF><i>Are you ready mr. hardkopy?</i></color></size>",
-  "SubCraftica.OptGroup_AreYouSure": "Are you sure?",
-  "SubCraftica.Opt_CreativeMode_Disabled": "Disabled",
-  "SubCraftica.Opt_CreativeMode_LetsGo": "Let's go!",
-  "SubCraftica.Tooltip_Recycle": "Recycle"
+  "SubCraftica.Tooltip_Total": "Tổng",
+  "SubCraftica.Opt_CreativeMode": "Chế độ sáng tạo",
+  "SubCraftica.OptDesc_CreativeMode": "Chỉ dành cho chế độ Creative Crafting. Chế độ này không cấp bất tử và không thay đổi các phần sinh tồn khác (đói, khát, oxy, máu, v.v.).\n\nChế tạo sẽ bỏ qua việc có sẵn nguyên liệu trong túi đồ và kho chứa.\nTất cả công thức sẽ được mở khóa khi chế độ này bật.\nChế tạo luôn tức thì trong chế độ này.\nChi phí năng lượng luôn bị tắt trong chế độ này, bất kể cài đặt năng lượng SubCraftica của bạn.\n\nCảnh báo: điều này có thể làm hỏng trải nghiệm chơi game dự kiến.\n\n<size=9><color=#FFAC09FF><i>Bạn đã sẵn sàng chưa, mr. hardkopy?</i></color></size>",
+  "SubCraftica.OptGroup_AreYouSure": "Bạn có chắc không?",
+  "SubCraftica.Opt_CreativeMode_Disabled": "Đã tắt",
+  "SubCraftica.Opt_CreativeMode_LetsGo": "Bắt đầu nào!",
+  "SubCraftica.Tooltip_Recycle": "Tái chế",
+  "SubCraftica.QueueStopped": "<color=#FFAC09FF>SubCraftica: hàng đợi đã dừng.</color>"
 }
-
-
