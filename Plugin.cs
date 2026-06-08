@@ -84,6 +84,8 @@ public sealed class Plugin : BaseUnityPlugin
         return failedPatchCount;
     }
 
+    private float _pinnedRecipesDirtyTimer;
+
     private void Update()
     {
         TryLateStackingRedetect();
@@ -92,6 +94,24 @@ public sealed class Plugin : BaseUnityPlugin
         Services?.NearbyStorage?.Update();
         Services?.TimeController.Update();
         RecipeOwnedIngredientsTooltipService.Update();
+        TryMarkPinnedRecipesDirty();
+    }
+
+    private void TryMarkPinnedRecipesDirty()
+    {
+        if (uGUI.main?.pinnedRecipes == null)
+        {
+            return;
+        }
+
+        _pinnedRecipesDirtyTimer += Time.deltaTime;
+        if (_pinnedRecipesDirtyTimer < 1f)
+        {
+            return;
+        }
+
+        _pinnedRecipesDirtyTimer = 0f;
+        AccessTools.FieldRefAccess<uGUI_PinnedRecipes, bool>(uGUI.main.pinnedRecipes, "ingredientsDirty") = true;
     }
 
     private void TryStopQueueHotkey()

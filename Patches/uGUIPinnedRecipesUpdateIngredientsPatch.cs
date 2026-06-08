@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Reflection.Emit;
 using HarmonyLib;
 
 namespace SubCraftica.Patches;
@@ -11,50 +11,117 @@ namespace SubCraftica.Patches;
 /// storage (respecting the player's configured storage mode), instead of only
 /// from the player's direct inventory container.
 /// </summary>
-[HarmonyPatch(typeof(uGUI_RecipeEntry), nameof(uGUI_RecipeEntry.UpdateIngredients))]
+[HarmonyPatch(typeof(uGUI_RecipeEntry), nameof(uGUI_RecipeEntry.UpdateIngredients), new[] { typeof(ItemsContainer), typeof(bool) })]
 internal static class uGUIPinnedRecipesUpdateIngredientsPatch
 {
-    private static readonly MethodInfo ContainerGetCount =
-        AccessTools.Method(typeof(ItemsContainer), nameof(ItemsContainer.GetCount));
+    private static readonly FieldInfo ItemsField =
+        AccessTools.Field(typeof(uGUI_RecipeEntry), "items");
 
-    private static readonly MethodInfo ModGetCount =
-        AccessTools.Method(typeof(uGUIPinnedRecipesUpdateIngredientsPatch), nameof(GetTotalCount));
+    private static readonly FieldInfo MinField =
+        AccessTools.Field(typeof(uGUI_RecipeEntry), "min");
 
-    [HarmonyTranspiler]
-    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    [HarmonyPostfix]
+    private static void Postfix(uGUI_RecipeEntry __instance, ItemsContainer container, bool ping)
     {
-        foreach (var instruction in instructions)
+        if (__instance == null || container == null || Plugin.Services == null)
         {
-            // Replace every call to ItemsContainer.GetCount(TechType) with our
-            // helper that adds nearby-storage and stacking-mod counts on top.
-            if (instruction.opcode == OpCodes.Callvirt
-                && instruction.operand is MethodInfo mi
-                && mi == ContainerGetCount)
+            return;
+        }
+
+        if (!(ItemsField?.GetValue(__instance) is List<uGUI_RecipeItem> items) || items.Count == 0)
+        {
+            return;
+        }
+
+        var ingredients = TechData.GetIngredients(__instance.techType);
+        if (ingredients == null || ingredients.Count == 0)
+        {
+            return;
+        }
+
+        var manager = __instance.manager;
+        if (manager == null)
+        {
+            return;
+        }
+
+        var itemCount = Math.Min(items.Count, ingredients.Count);
+        var craftsAvailable = -1;
+
+        for (var i = 0; i < itemCount; i++)
+        {
+            var ingredient = ingredients[i];
+            var amount = ingredient.amount;
+            if (amount <= 0)
             {
-                // Stack at this point: ..., ItemsContainer, TechType
-                // Our helper has the same signature: (ItemsContainer, TechType) -> int
-                yield return new CodeInstruction(OpCodes.Call, ModGetCount);
+                amount = 1;
+            }
+
+            var count = GetTotalCount(container, ingredient.techType);
+            var craftsForIngredient = count / amount;
+            if (craftsAvailable < 0 || craftsForIngredient < craftsAvailable)
+            {
+                craftsAvailable = craftsForIngredient;
+            }
+
+            var recipeItem = items[i];
+            if (recipeItem == null)
+            {
                 continue;
             }
 
-            yield return instruction;
+            var text = recipeItem.text;
+            if (text != null)
+            {
+                text.color = count >= amount ? manager.colorGreen : manager.colorRed;
+            }
+
+            recipeItem.Set(ingredient.techType, count, amount, ping);
+        }
+
+        var craftAmount = TechData.GetCraftAmount(__instance.techType);
+        if (craftAmount <= 0)
+        {
+            craftAmount = 1;
+        }
+
+        var totalCrafts = craftsAvailable * craftAmount;
+        if (totalCrafts > 0)
+        {
+            MinField?.SetValue(__instance, totalCrafts);
+            if (__instance.text != null)
+            {
+                __instance.text.text = $"x{IntStringCache.GetStringForInt(totalCrafts)}";
+            }
+        }
+        else
+        {
+            MinField?.SetValue(__instance, int.MinValue);
+            if (__instance.text != null)
+            {
+                __instance.text.text = string.Empty;
+            }
         }
     }
 
     /// <summary>
     /// Returns the total count of <paramref name="techType"/> visible from the
-    /// player's inventory plus all eligible nearby/base/pod storage containers,
-    /// using the same logic as the rest of SubCraftica's resource counting.
+    /// player's inventory plus all eligible nearby/base/pod storage containers.
     /// </summary>
     private static int GetTotalCount(ItemsContainer container, TechType techType)
     {
+        if (container == null)
+        {
+            return 0;
+        }
+
         if (Plugin.Services == null)
         {
             return container.GetCount(techType);
         }
 
-        var inventoryCount = Plugin.Services.StackingCount.GetContainerCount(container, techType);
-        var nearbyCount = Plugin.Services.NearbyStorage.GetNearbyCount(techType, container);
-        return inventoryCount + nearbyCount;
+        var inventory = Plugin.Services.StackingCount.GetContainerCount(container, techType);
+        var storage = Plugin.Services.NearbyStorage.GetNearbyCount(techType, container);
+        return inventory + storage;
     }
 }

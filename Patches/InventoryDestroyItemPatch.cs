@@ -68,7 +68,7 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
-        if (TryAutoCraftForConstruct(destroyTechType))
+        if (TryAutoCraftForMissingIngredient(destroyTechType))
         {
             __result = true;
             return;
@@ -113,7 +113,7 @@ internal static class InventoryDestroyItemPatch
         RecipeOwnedIngredientsTooltipService.MarkDataDirty();
     }
 
-    private static bool TryAutoCraftForConstruct(TechType techType)
+    private static bool TryAutoCraftForMissingIngredient(TechType techType)
     {
         var plan = Plugin.Services.RecipePlanner.BuildPlan(techType, 1);
         if (plan == null || !plan.Success || plan.Consumed == null || plan.Crafted == null)
@@ -213,11 +213,34 @@ internal static class InventoryDestroyItemPatch
 
     private static bool ConsumeAutoCraftResultImmediately(Dictionary<TechType, int> consumed, Dictionary<TechType, int> crafted, TechType requestedType)
     {
-        var used = consumed.TryGetValue(requestedType, out var consumedAmount) ? consumedAmount : 0;
-        var produced = crafted.TryGetValue(requestedType, out var craftedAmount) ? craftedAmount : 0;
-        if (produced <= used)
+        var usedForRequested = consumed.TryGetValue(requestedType, out var consumedAmount) ? consumedAmount : 0;
+        var producedForRequested = crafted.TryGetValue(requestedType, out var craftedAmount) ? craftedAmount : 0;
+        var netForRequested = producedForRequested - usedForRequested;
+        if (netForRequested <= 0)
         {
             return false;
+        }
+
+        foreach (var pair in crafted)
+        {
+            var used = consumed.TryGetValue(pair.Key, out var usedAmount) ? usedAmount : 0;
+            var netProduced = pair.Value - used;
+
+            // One unit of requestedType is consumed by the current DestroyItem call.
+            if (pair.Key == requestedType)
+            {
+                netProduced--;
+            }
+
+            if (netProduced <= 0)
+            {
+                continue;
+            }
+
+            for (var i = 0; i < netProduced; i++)
+            {
+                GiveProducedItem(pair.Key);
+            }
         }
 
         return true;

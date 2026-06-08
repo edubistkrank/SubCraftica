@@ -54,10 +54,6 @@ internal static class InventoryResourceStacksCompatPatch
         {
             StorageCompatLogger.LogCompatibilityWarningOnce(InitializeWarningKey + ".Members", "Inventory Resource Stacks compatibility is missing one or more reflected members.");
         }
-        else
-        {
-            StorageCompatLogger.LogDetectedBackend(Services.Stacking.StackingBackend.InventoryResourceStacks);
-        }
     }
 
     internal static int GetContainerCount(ItemsContainer container, TechType techType)
@@ -132,7 +128,6 @@ internal static class InventoryResourceStacksCompatPatch
     {
         if (inventoryContainer == null || lastResyncFrame == Time.frameCount)
         {
-            StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".SkippedFrame", "Skipped resync because inventoryContainer is null or already resynced this frame.");
             return;
         }
 
@@ -179,27 +174,16 @@ internal static class InventoryResourceStacksCompatPatch
 
                 // Throttle materialization per-techType to avoid rapid repeated spawns
                 // that produce pickup sounds and UI popups when players hold down inputs.
-                if (lastMaterializeAt.TryGetValue(techType, out var lastAt))
+                if (lastMaterializeAt.TryGetValue(techType, out var lastAt)
+                    && Time.unscaledTime - lastAt < MaterializeCooldownSeconds)
                 {
-                    if (Time.unscaledTime - lastAt < MaterializeCooldownSeconds)
-                    {
-                        var msg = $"Skipping materialize for {techType} due to cooldown (last at {lastAt}).";
-                        StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".CooldownSkipped", msg);
-                        StorageCompatFileLogger.LogWarning(msg);
-                        continue;
-                    }
+                    continue;
                 }
 
                 try
                 {
-                    var startMsg = $"Materializing 1 unit of {techType} at time {Time.unscaledTime}.";
-                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".MaterializeStart", startMsg);
-                    StorageCompatFileLogger.LogInfo(startMsg);
                     materializeMethod.Invoke(null, new object[] { techType, 1 });
                     lastMaterializeAt[techType] = Time.unscaledTime;
-                    var doneMsg = $"Materialized {techType} successfully.";
-                    StorageCompatLogger.LogCompatibilityWarningOnce(ResyncWarningKey + ".MaterializeDone", doneMsg);
-                    StorageCompatFileLogger.LogInfo(doneMsg);
                 }
                 catch (Exception ex)
                 {
