@@ -100,6 +100,7 @@
     <Compile Include="Patches\Compat\MadesRedoInventoryStackingCompatPatch.cs" />
     <Compile Include="Patches\Compat\VisibleLockerInteriorCompatPatch.cs" />
     <Compile Include="Patches\ConstructableConstructPatch.cs" />
+    <Compile Include="Patches\ConstructableGetConstructIntervalPatch.cs" />
     <Compile Include="Patches\CrafterCraftDurationPatch.cs" />
     <Compile Include="Patches\CrafterLogicIsCraftRecipeFulfilledPatch.cs" />
     <Compile Include="Patches\CrafterLogicTryPickupSinglePatch.cs" />
