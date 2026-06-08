@@ -113,6 +113,7 @@
     <Compile Include="Patches\TooltipFactoryCraftRecipePatch.cs" />
     <Compile Include="Patches\TooltipFactoryWriteIngredientsPatch.cs" />
     <Compile Include="Patches\uGUICraftingMenuActionPatch.cs" />
+    <Compile Include="Patches\uGUIPinnedRecipesUpdateIngredientsPatch.cs" />
     <Compile Include="Patches\uGUICraftingMenuClosePatch.cs" />
     <Compile Include="Patches\uGUIInventoryStorageExtractionTogglePatch.cs" />
     <Compile Include="Patches\uGUIInventoryStorageSurplusTogglePatch.cs" />
@@ -149,7 +150,6 @@
     <Compile Include="Services\Resources\StoragePreferredSurplusService.cs" />
     <Compile Include="Services\Resources\StackingCountService.cs" />
     <Compile Include="Services\Resources\StorageCompatLogger.cs" />
-    <Compile Include="Services\Resources\StorageCompatFileLogger.cs" />
     <Compile Include="Services\Resources\StorageExtractionExclusionService.cs" />
     <Compile Include="Services\Resources\StorageIdentifierResolver.cs" />
     <Compile Include="Services\Stacking\StackingBackend.cs" />
