@@ -1,3 +1,4 @@
+using HarmonyLib;
 using SubCraftica.Services.Compat;
 using SubCraftica.Services.Configuration;
 using UnityEngine;
@@ -134,7 +135,34 @@ internal sealed class QuantitySelectionService
     private bool IsCraftSessionActive()
     {
         return (synchronization != null && synchronization.IsCraftInProgress)
-            || (queue != null && queue.Count > 0);
+            || (queue != null && queue.Count > 0)
+            || IsMenuClientCraftingInProgress();
+    }
+
+    private static bool IsMenuClientCraftingInProgress()
+    {
+        var menu = uGUI.main != null ? uGUI.main.craftingMenu : null;
+        var client = menu != null ? menu.client : null;
+        if (client == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var craftingField = AccessTools.Field(client.GetType(), "crafting");
+            if (craftingField == null)
+            {
+                return false;
+            }
+
+            var value = craftingField.GetValue(client);
+            return value is bool isCrafting && isCrafting;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private int HandleControllerAdjust(TechType techType, int amount)
