@@ -108,6 +108,19 @@ internal static class GhostCrafterCraftingEndPatch
         var craftingMode = Plugin.Services.Config.CraftingMode.Value;
         SubCrafticaLogger.LogDebug($"[GhostCrafterCraftingEndPatch.Postfix] Crafting mode: {craftingMode}");
 
+        var prototypeCompat = Plugin.Services.PrototypeSubCompat;
+        var isPrototypeFabricator = prototypeCompat != null && prototypeCompat.IsPrototypeFabricator(__instance);
+        if (isPrototypeFabricator)
+        {
+            if (Plugin.Services.Runtime.TryGetLastTechType(out var lastTechType))
+            {
+                Plugin.Services.RecipeOverride.Restore(lastTechType);
+                Plugin.Services.Runtime.Clear(lastTechType);
+                Plugin.Services.CraftRuntimeState.Clear(lastTechType);
+                SubCrafticaLogger.LogDebug($"[GhostCrafterCraftingEndPatch.Postfix] Prototype cleanup applied after crafting end for {lastTechType}");
+            }
+        }
+
         if (craftingMode != ModConfig.CraftingModePerItem)
         {
             SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] Not per-item mode, skipping queue continuation");
@@ -228,27 +241,10 @@ internal static class GhostCrafterCraftingEndPatch
             yield break;
         }
 
-        if (Plugin.Services.PrototypeSubCompat != null && Plugin.Services.PrototypeSubCompat.IsPrototypeFabricator(crafter))
-        {
-            waitFrames = 0;
-            while (Plugin.Services.PrototypeSubCompat.IsAlienFabricatorCrafting(crafter) && waitFrames < 240)
-            {
-                waitFrames++;
-                yield return null;
-            }
-            SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Prototype craft-state wait finished after {waitFrames} frames");
-        }
-
         // Queue continues — clear the progress line of the item that just finished
         SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Continuing queue with next: {next.TechType}");
         Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
-
-        var isPrototypeFabricator = Plugin.Services.PrototypeSubCompat != null
-                                    && Plugin.Services.PrototypeSubCompat.IsPrototypeFabricator(crafter);
-        if (!isPrototypeFabricator)
-        {
-            TrySetCraftingMenuLocked(crafter, true);
-        }
+        TrySetCraftingMenuLocked(crafter, true);
 
         var duration = 3f;
         TechData.GetCraftTime(next.TechType, out duration);

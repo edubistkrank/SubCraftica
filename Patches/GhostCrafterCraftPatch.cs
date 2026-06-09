@@ -30,32 +30,22 @@ internal static class GhostCrafterCraftPatch
             return true;
         }
 
-        // For AlienFabricator in per-item mode, skip the synchronization lock
-        // because AlienFabricator has its own 'crafting' field that prevents concurrent calls
-        var isAlienFabricator = Services.PrototypeSubCompat != null && Services.PrototypeSubCompat.IsPrototypeFabricator(__instance);
-        var isPerItemMode = Services.Config.CraftingMode.Value == ModConfig.CraftingModePerItem;
-
-        if (isAlienFabricator && isPerItemMode)
+        if (Services.PrototypeSubCompat != null
+            && Services.Config.CraftingMode.Value == ModConfig.CraftingModePerItem
+            && Services.PrototypeSubCompat.IsPrototypeFabricator(__instance))
         {
-            SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] AlienFabricator in per-item mode - skipping sync lock");
-            _didEnterCraft = false;  // Will not try to exit
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] Prototype per-item handled by compat patch, skipping main queue handling");
+            return true;
+        }
 
-            if (Services.PrototypeSubCompat.IsAlienFabricatorCrafting(__instance))
-            {
-                SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] AlienFabricator still crafting, deferring queue dequeue");
-                return true;
-            }
-        }
-        else
+
+        if (!Services.Synchronization.TryEnterCraft())
         {
-            if (!Services.Synchronization.TryEnterCraft())
-            {
-                SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] Synchronization failed - craft already running");
-                ErrorMessage.AddWarning(ModText.Get(ModText.CraftAlreadyRunning));
-                return false;
-            }
-            _didEnterCraft = true;
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] Synchronization failed - craft already running");
+            ErrorMessage.AddWarning(ModText.Get(ModText.CraftAlreadyRunning));
+            return false;
         }
+        _didEnterCraft = true;
 
         Services.Runtime.SetLastTechType(techType);
         SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Entered craft handling for techType={techType}");
@@ -72,7 +62,9 @@ internal static class GhostCrafterCraftPatch
         SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Dequeued request: amount={request.Amount}, totalAmount={request.TotalAmount}");
         var craftingMode = Services.Config.CraftingMode.Value;
 
-        var result = craftingMode == ModConfig.CraftingModePerItem
+        var usePerItemFlow = craftingMode == ModConfig.CraftingModePerItem;
+
+        var result = usePerItemFlow
             ? HandlePerItemCraft(__instance, techType, request)
             : HandleBatchOrInstantCraft(__instance, techType, request, craftingMode);
 
@@ -271,7 +263,7 @@ internal static class GhostCrafterCraftPatch
     }
 
     [HarmonyFinalizer]
-    private static Exception Finalizer(Exception __exception, TechType techType)
+    private static Exception Finalizer(Exception __exception, GhostCrafter __instance, TechType techType)
     {
         if (__exception != null)
         {
@@ -282,9 +274,21 @@ internal static class GhostCrafterCraftPatch
             SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Finalizer] Success for techType={techType}");
         }
 
-        Services?.RecipeOverride.Restore(techType);
-        Services?.Runtime.Clear(techType);
-        Services?.CraftRuntimeState.Clear(techType);
+        var shouldDeferCleanupForPrototype = Services != null
+                                             && Services.Config.CraftingMode.Value != ModConfig.CraftingModePerItem
+                                             && Services.PrototypeSubCompat != null
+                                             && Services.PrototypeSubCompat.IsPrototypeFabricator(__instance);
+
+        if (shouldDeferCleanupForPrototype)
+        {
+            SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Finalizer] Deferring recipe/runtime cleanup for Prototype client techType={techType}");
+        }
+        else
+        {
+            Services?.RecipeOverride.Restore(techType);
+            Services?.Runtime.Clear(techType);
+            Services?.CraftRuntimeState.Clear(techType);
+        }
 
         if (_didEnterCraft)
         {

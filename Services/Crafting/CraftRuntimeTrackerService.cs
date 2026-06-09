@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+
 namespace SubCraftica.Services.Crafting;
 
 internal sealed class CraftRuntimeTrackerService
 {
     private TechType lastTechType = TechType.None;
-    private TechType lastPerItemFinished = TechType.None;
+    private readonly Queue<TechType> perItemFinishedQueue = new Queue<TechType>();
 
     public void SetLastTechType(TechType techType)
     {
@@ -25,20 +27,24 @@ internal sealed class CraftRuntimeTrackerService
     }
 
     /// <summary>
-    /// Called at per-item craft start so the finished techType survives until OnCraftingEnd.
+    /// Called at per-item craft start so each completed craft can be matched later in OnCraftingEnd,
+    /// even if another craft starts before the previous end event arrives.
     /// </summary>
     public void SetLastPerItemFinished(TechType techType)
     {
-        lastPerItemFinished = techType;
+        if (techType == TechType.None)
+        {
+            return;
+        }
+
+        perItemFinishedQueue.Enqueue(techType);
     }
 
     /// <summary>
-    /// Reads and clears the stored finished techType. Returns TechType.None if not set.
+    /// Consumes one finished techType in FIFO order. Returns TechType.None if queue is empty.
     /// </summary>
     public TechType ConsumeLastPerItemFinished()
     {
-        var t = lastPerItemFinished;
-        lastPerItemFinished = TechType.None;
-        return t;
+        return perItemFinishedQueue.Count > 0 ? perItemFinishedQueue.Dequeue() : TechType.None;
     }
 }

@@ -1,13 +1,17 @@
 using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Localization;
 using SubCraftica.Services.UI;
+using UnityEngine;
 
 namespace SubCraftica.Services.Crafting;
 
 internal sealed class QueueFeedbackService
 {
+    private const float QueueCompletedDebounceSeconds = 0.35f;
+
     private readonly QueueProgressMessageService progressMessages;
     private readonly ModConfig config;
+    private float lastQueueCompletedAt = -999f;
 
     public QueueFeedbackService(QueueProgressMessageService progressMessages, ModConfig config)
     {
@@ -63,6 +67,13 @@ internal sealed class QueueFeedbackService
 
     public void NotifyQueueCompleted()
     {
+        var now = Time.unscaledTime;
+        if (now - lastQueueCompletedAt < QueueCompletedDebounceSeconds)
+        {
+            return;
+        }
+
+        lastQueueCompletedAt = now;
         progressMessages.Clear();
         ErrorMessage.AddMessage(ModText.Get(ModText.QueueCompleted));
     }
