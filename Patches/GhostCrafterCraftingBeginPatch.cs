@@ -102,17 +102,7 @@ internal static class GhostCrafterCraftingEndPatch
         }
         else
         {
-            SubCrafticaLogger.LogWarning("[GhostCrafterCraftingEndPatch.Postfix] Logic is null - might be custom fabricator (AlienFabricator?)");
-        }
-
-        // Check if this is a custom fabricator that doesn't support per-item queuing
-        var instanceType = __instance?.GetType().FullName ?? "unknown";
-        var isAlienFabricator = instanceType.Contains("AlienFabricator");
-
-        if (isAlienFabricator)
-        {
-            SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] AlienFabricator detected - skipping per-item queue continuation");
-            return;
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] Logic is null - custom fabricator detected");
         }
 
         var craftingMode = Plugin.Services.Config.CraftingMode.Value;
@@ -264,6 +254,7 @@ internal static class GhostCrafterCraftingEndPatch
             var result = CrafterHasCraftedItemMethod?.Invoke(crafter, null);
             if (result is bool has && has)
             {
+                SubCrafticaLogger.LogDebug("[HasCraftedItem] Reflection method returned True");
                 return true;
             }
         }
@@ -272,23 +263,13 @@ internal static class GhostCrafterCraftingEndPatch
             // Silently continue to fallback
         }
 
-        // Fallback: check via logic.recipe (works for AlienFabricator and other custom crafter types)
-        try
-        {
-            var logic = Traverse.Create(crafter).Field<CrafterLogic>("logic").Value;
-            if (logic != null)
-            {
-                var recipe = Traverse.Create(logic).Field<object>("recipe").Value;
-                SubCrafticaLogger.LogDebug($"[HasCraftedItem] Fallback check: logic exists, recipe={recipe}");
-                return recipe != null;
-            }
-        }
-        catch (Exception ex)
-        {
-            SubCrafticaLogger.LogDebug($"[HasCraftedItem] Fallback check failed: {ex.Message}");
-        }
-
-        return false;
+        // Fallback for custom fabricators without CrafterLogic:
+        // For AlienFabricator and similar, we assume an item was crafted if we got here
+        // because OnCraftingEnd is only called after crafting completes.
+        // The only way HasCraftedItem could be false legitimately is if vanilla GhostCrafter
+        // had no output recipe, which is rare.
+        SubCrafticaLogger.LogDebug("[HasCraftedItem] No reflection result, assuming custom fabricator produced output");
+        return true;  // Assume crafted for custom fabricators
     }
 
     private static void TrySetCraftingMenuLocked(GhostCrafter crafter, bool locked)
