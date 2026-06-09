@@ -1,6 +1,8 @@
 using System;
 using BepInEx.Bootstrap;
 using HarmonyLib;
+using SubCraftica.Services.Composition;
+using SubCraftica.Services.Configuration;
 
 namespace SubCraftica.Services.Compat;
 
@@ -93,5 +95,32 @@ internal sealed class PrototypeSubCompatService
     public bool IsAlienFabricatorCrafting(uGUI_CraftingMenu menu)
     {
         return IsAlienFabricatorCrafting(menu != null ? menu.client : null);
+    }
+
+    public bool ShouldBypassMainCraftPrefix(GhostCrafter crafter, int craftingMode)
+    {
+        return craftingMode == ModConfig.CraftingModePerItem && IsPrototypeFabricator(crafter);
+    }
+
+    public bool ShouldDeferCraftCleanup(GhostCrafter crafter, int craftingMode)
+    {
+        return craftingMode != ModConfig.CraftingModePerItem && IsPrototypeFabricator(crafter);
+    }
+
+    public void TryCleanupAfterCraftingEnd(GhostCrafter crafter, ModServices services)
+    {
+        if (services == null || !ShouldDeferCraftCleanup(crafter, services.Config.CraftingMode.Value))
+        {
+            return;
+        }
+
+        if (!services.Runtime.TryGetLastTechType(out var lastTechType))
+        {
+            return;
+        }
+
+        services.RecipeOverride.Restore(lastTechType);
+        services.Runtime.Clear(lastTechType);
+        services.CraftRuntimeState.Clear(lastTechType);
     }
 }

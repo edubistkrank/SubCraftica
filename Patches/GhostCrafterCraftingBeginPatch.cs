@@ -108,18 +108,7 @@ internal static class GhostCrafterCraftingEndPatch
         var craftingMode = Plugin.Services.Config.CraftingMode.Value;
         SubCrafticaLogger.LogDebug($"[GhostCrafterCraftingEndPatch.Postfix] Crafting mode: {craftingMode}");
 
-        var prototypeCompat = Plugin.Services.PrototypeSubCompat;
-        var isPrototypeFabricator = prototypeCompat != null && prototypeCompat.IsPrototypeFabricator(__instance);
-        if (isPrototypeFabricator)
-        {
-            if (Plugin.Services.Runtime.TryGetLastTechType(out var lastTechType))
-            {
-                Plugin.Services.RecipeOverride.Restore(lastTechType);
-                Plugin.Services.Runtime.Clear(lastTechType);
-                Plugin.Services.CraftRuntimeState.Clear(lastTechType);
-                SubCrafticaLogger.LogDebug($"[GhostCrafterCraftingEndPatch.Postfix] Prototype cleanup applied after crafting end for {lastTechType}");
-            }
-        }
+        Plugin.Services.PrototypeSubCompat?.TryCleanupAfterCraftingEnd(__instance, Plugin.Services);
 
         if (craftingMode != ModConfig.CraftingModePerItem)
         {

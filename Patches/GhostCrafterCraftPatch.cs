@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Reflection;
 using HarmonyLib;
 using SubCraftica.Services.Composition;
 using SubCraftica.Services.Configuration;
@@ -31,10 +33,8 @@ internal static class GhostCrafterCraftPatch
         }
 
         if (Services.PrototypeSubCompat != null
-            && Services.Config.CraftingMode.Value == ModConfig.CraftingModePerItem
-            && Services.PrototypeSubCompat.IsPrototypeFabricator(__instance))
+            && Services.PrototypeSubCompat.ShouldBypassMainCraftPrefix(__instance, Services.Config.CraftingMode.Value))
         {
-            SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] Prototype per-item handled by compat patch, skipping main queue handling");
             return true;
         }
 
@@ -275,15 +275,10 @@ internal static class GhostCrafterCraftPatch
         }
 
         var shouldDeferCleanupForPrototype = Services != null
-                                             && Services.Config.CraftingMode.Value != ModConfig.CraftingModePerItem
                                              && Services.PrototypeSubCompat != null
-                                             && Services.PrototypeSubCompat.IsPrototypeFabricator(__instance);
+                                             && Services.PrototypeSubCompat.ShouldDeferCraftCleanup(__instance, Services.Config.CraftingMode.Value);
 
-        if (shouldDeferCleanupForPrototype)
-        {
-            SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Finalizer] Deferring recipe/runtime cleanup for Prototype client techType={techType}");
-        }
-        else
+        if (!shouldDeferCleanupForPrototype)
         {
             Services?.RecipeOverride.Restore(techType);
             Services?.Runtime.Clear(techType);
@@ -305,23 +300,73 @@ internal static class GhostCrafterCraftPatch
 [HarmonyPatch(typeof(GhostCrafter), "OnCraftingEnd")]
 internal static class GhostCrafterBatchInstantCompletionPatch
 {
+    private static readonly MethodInfo GhostCrafterCraftMethod = AccessTools.Method(typeof(GhostCrafter), "Craft", new[] { typeof(TechType), typeof(float) });
+
+    private static IEnumerator ContinueBatchQueue(GhostCrafter crafter, ModServices services)
+    {
+        yield return null;
+
+        var waitFrames = 0;
+        while (services.QueueCoordinator.HasPendingPickupOperations && waitFrames < 60)
+        {
+            waitFrames++;
+            yield return null;
+        }
+
+        if (services.QueueCoordinator.ConsumeStopQueueContinuationRequested())
+        {
+            services.QueueFeedback.ClearAllProgress();
+            services.QueueCoordinator.ResetForQueueEnd();
+            yield break;
+        }
+
+        if (!services.Queue.TryPeek(out var next) || next == null)
+        {
+            if (services.QueueCoordinator.ConsumeShouldNotifyQueueCompleted())
+            {
+                services.QueueFeedback.NotifyQueueCompleted();
+            }
+
+            services.QueueCoordinator.ResetForQueueEnd();
+            yield break;
+        }
+
+        var duration = 3f;
+        TechData.GetCraftTime(next.TechType, out duration);
+        GhostCrafterCraftMethod?.Invoke(crafter, new object[] { next.TechType, duration });
+    }
+
     [HarmonyPostfix]
-    private static void Postfix()
+    private static void Postfix(GhostCrafter __instance)
     {
         var services = Plugin.Services;
-        if (services == null)
+        if (services == null || __instance == null)
         {
             return;
         }
 
-        if (services.Config.CraftingMode.Value == ModConfig.CraftingModePerItem)
+        var prototypeCompat = services.PrototypeSubCompat;
+        if (prototypeCompat != null && prototypeCompat.IsPrototypeFabricator(__instance))
         {
+            return;
+        }
+
+        var craftingMode = services.Config.CraftingMode.Value;
+        if (craftingMode == ModConfig.CraftingModePerItem)
+        {
+            return;
+        }
+
+        if (craftingMode == ModConfig.CraftingModeBatch)
+        {
+            __instance.StartCoroutine(ContinueBatchQueue(__instance, services));
             return;
         }
 
         if (services.QueueCoordinator.ConsumeShouldNotifyQueueCompleted())
         {
             services.QueueFeedback.NotifyQueueCompleted();
+            services.QueueCoordinator.ResetForQueueEnd();
         }
     }
 }
