@@ -103,6 +103,11 @@ internal static class PrototypeSubGhostCrafterCraftCompatPatch
             SubCrafticaLogger.LogDebug($"[PrototypeSubCompat.Finalizer] Invoking GhostCrafterCraftPatch.Finalizer");
             var result = GhostCrafterFinalizerMethod.Invoke(null, new object[] { __exception, techType });
 
+            if (result == null)
+            {
+                return null;
+            }
+
             if (result is Exception forwarded)
             {
                 if (forwarded != __exception)
@@ -112,7 +117,7 @@ internal static class PrototypeSubGhostCrafterCraftCompatPatch
                 return forwarded;
             }
 
-            SubCrafticaLogger.LogWarning($"[PrototypeSubCompat.Finalizer] GhostCrafterCraftPatch.Finalizer returned unexpected type: {result?.GetType().FullName ?? "null"}");
+            SubCrafticaLogger.LogWarning($"[PrototypeSubCompat.Finalizer] GhostCrafterCraftPatch.Finalizer returned unexpected type: {result.GetType().FullName}");
         }
         catch (TargetInvocationException tiex)
         {

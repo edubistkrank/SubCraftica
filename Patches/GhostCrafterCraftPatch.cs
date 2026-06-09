@@ -30,16 +30,35 @@ internal static class GhostCrafterCraftPatch
             return true;
         }
 
-        if (!Services.Synchronization.TryEnterCraft())
+        // For AlienFabricator in per-item mode, skip the synchronization lock
+        // because AlienFabricator has its own 'crafting' field that prevents concurrent calls
+        var isAlienFabricator = Services.PrototypeSubCompat != null && Services.PrototypeSubCompat.IsPrototypeFabricator(__instance);
+        var isPerItemMode = Services.Config.CraftingMode.Value == ModConfig.CraftingModePerItem;
+
+        if (isAlienFabricator && isPerItemMode)
         {
-            SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] Synchronization failed - craft already running");
-            ErrorMessage.AddWarning(ModText.Get(ModText.CraftAlreadyRunning));
-            return false;
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] AlienFabricator in per-item mode - skipping sync lock");
+            _didEnterCraft = false;  // Will not try to exit
+
+            if (Services.PrototypeSubCompat.IsAlienFabricatorCrafting(__instance))
+            {
+                SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] AlienFabricator still crafting, deferring queue dequeue");
+                return true;
+            }
+        }
+        else
+        {
+            if (!Services.Synchronization.TryEnterCraft())
+            {
+                SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] Synchronization failed - craft already running");
+                ErrorMessage.AddWarning(ModText.Get(ModText.CraftAlreadyRunning));
+                return false;
+            }
+            _didEnterCraft = true;
         }
 
-        _didEnterCraft = true;
         Services.Runtime.SetLastTechType(techType);
-        SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Entered craft synchronization for techType={techType}");
+        SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Entered craft handling for techType={techType}");
 
         if (!Services.Queue.TryDequeueForTechType(techType, out var request))
         {
@@ -276,7 +295,8 @@ internal static class GhostCrafterCraftPatch
 
         return __exception;
     }
-}
+
+    }
 
 [HarmonyPatch(typeof(GhostCrafter), "OnCraftingEnd")]
 internal static class GhostCrafterBatchInstantCompletionPatch

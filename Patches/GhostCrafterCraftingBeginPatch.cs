@@ -150,64 +150,64 @@ internal static class GhostCrafterCraftingEndPatch
         }
         SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Waited {waitFrames} frames for pickup ops");
 
-        // Resolve crafted output before queue continuation.
-        var hasCrafted = HasCraftedItem(crafter);
-        SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] HasCraftedItem check: {hasCrafted}");
-
-        if (hasCrafted)
+        var logic = Traverse.Create(crafter).Field<CrafterLogic>("logic").Value;
+        if (logic == null)
         {
-            var logic = Traverse.Create(crafter).Field<CrafterLogic>("logic").Value;
-            if (logic != null)
-            {
-                SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] Calling logic.TryPickup()");
-                logic.TryPickup();
-            }
-            else
-            {
-                SubCrafticaLogger.LogWarning("[HandlePerItemQueueEnd] Logic is null during hasCrafted branch!");
-            }
-
-            waitFrames = 0;
-            while (Plugin.Services.QueueCoordinator.HasPendingPickupOperations && waitFrames < 60)
-            {
-                waitFrames++;
-                yield return null;
-            }
-            SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Waited {waitFrames} frames for pickup ops (2nd)");
-
-            var retryFrames = 0;
-            while (HasCraftedItem(crafter))
-            {
-                if (Plugin.Services == null || crafter == null)
-                {
-                    SubCrafticaLogger.LogWarning("[HandlePerItemQueueEnd] Lost services/crafter during retry loop");
-                    yield break;
-                }
-
-                // If queue was manually stopped (Backspace), honor it immediately.
-                if (Plugin.Services.QueueCoordinator.ConsumeStopQueueContinuationRequested())
-                {
-                    SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] Queue continuation stopped (manual)");
-                    Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
-                    Plugin.Services.QueueCoordinator.ResetForQueueEnd();
-                    TrySetCraftingMenuLocked(crafter, false);
-                    yield break;
-                }
-
-                retryFrames++;
-                if (logic != null && retryFrames % 30 == 0)
-                {
-                    SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Retry TryPickup (frame {retryFrames})");
-                    logic.TryPickup();
-                }
-
-                yield return null;
-            }
-            SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Item pickup complete after {retryFrames} retries");
+            SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] Logic is null - custom fabricator detected, skipping pickup loop");
         }
         else
         {
-            SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] No crafted item detected, skipping pickup loop");
+            // Resolve crafted output before queue continuation.
+            var hasCrafted = HasCraftedItem(crafter);
+            SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] HasCraftedItem check: {hasCrafted}");
+
+            if (hasCrafted)
+            {
+                SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] Calling logic.TryPickup()");
+                logic.TryPickup();
+
+                waitFrames = 0;
+                while (Plugin.Services.QueueCoordinator.HasPendingPickupOperations && waitFrames < 60)
+                {
+                    waitFrames++;
+                    yield return null;
+                }
+                SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Waited {waitFrames} frames for pickup ops (2nd)");
+
+                var retryFrames = 0;
+                while (HasCraftedItem(crafter))
+                {
+                    if (Plugin.Services == null || crafter == null)
+                    {
+                        SubCrafticaLogger.LogWarning("[HandlePerItemQueueEnd] Lost services/crafter during retry loop");
+                        yield break;
+                    }
+
+                    // If queue was manually stopped (Backspace), honor it immediately.
+                    if (Plugin.Services.QueueCoordinator.ConsumeStopQueueContinuationRequested())
+                    {
+                        SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] Queue continuation stopped (manual)");
+                        Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
+                        Plugin.Services.QueueCoordinator.ResetForQueueEnd();
+                        TrySetCraftingMenuLocked(crafter, false);
+                        yield break;
+                    }
+
+                    retryFrames++;
+                    if (retryFrames % 30 == 0)
+                    {
+                        SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Retry TryPickup (frame {retryFrames})");
+                        logic.TryPickup();
+                    }
+
+                    yield return null;
+                }
+                SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Item pickup complete after {retryFrames} retries");
+            }
+            else
+            {
+                SubCrafticaLogger.LogDebug("[HandlePerItemQueueEnd] No crafted item detected, skipping pickup loop");
+            }
         }
 
         if (Plugin.Services.QueueCoordinator.ConsumeStopQueueContinuationRequested())
@@ -228,11 +228,27 @@ internal static class GhostCrafterCraftingEndPatch
             yield break;
         }
 
+        if (Plugin.Services.PrototypeSubCompat != null && Plugin.Services.PrototypeSubCompat.IsPrototypeFabricator(crafter))
+        {
+            waitFrames = 0;
+            while (Plugin.Services.PrototypeSubCompat.IsAlienFabricatorCrafting(crafter) && waitFrames < 240)
+            {
+                waitFrames++;
+                yield return null;
+            }
+            SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Prototype craft-state wait finished after {waitFrames} frames");
+        }
+
         // Queue continues — clear the progress line of the item that just finished
         SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Continuing queue with next: {next.TechType}");
         Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
 
-        TrySetCraftingMenuLocked(crafter, true);
+        var isPrototypeFabricator = Plugin.Services.PrototypeSubCompat != null
+                                    && Plugin.Services.PrototypeSubCompat.IsPrototypeFabricator(crafter);
+        if (!isPrototypeFabricator)
+        {
+            TrySetCraftingMenuLocked(crafter, true);
+        }
 
         var duration = 3f;
         TechData.GetCraftTime(next.TechType, out duration);
@@ -298,4 +314,5 @@ internal static class GhostCrafterCraftingEndPatch
             StorageCompatLogger.LogCompatibilityWarningOnce(CraftingMenuLockWarningKey, $"Could not synchronize crafting menu lock state: {ex.Message}");
         }
     }
-}
+
+    }

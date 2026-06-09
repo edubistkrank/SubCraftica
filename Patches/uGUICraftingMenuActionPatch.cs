@@ -75,18 +75,46 @@ internal static class uGUICraftingMenuActionPatch
         // Clear focus so the next hover on this item starts at x1
         Plugin.Services.Quantity.ResetFocus(techType);
 
-        // If craft is in progress OR there are other items already in queue,
-        // this item is waiting — register a pending progress line immediately.
+        var isMenuClientCraftingInProgress = IsMenuClientCraftingInProgress(__instance);
+
+        // Register pending progress as soon as the request enters the queue.
+        // Using Count >= 1 avoids missing the immediate next x1 enqueue in short craft-state windows.
         var isPending = Plugin.Services.Synchronization.IsCraftInProgress
-                     || Plugin.Services.Queue.Count > 1;
+                     || isMenuClientCraftingInProgress
+                     || Plugin.Services.Queue.Count >= 1;
         Plugin.Services.QueueFeedback.NotifyQueued(request, isPending);
 
-        if (Plugin.Services.Synchronization.IsCraftInProgress)
+        if (Plugin.Services.Synchronization.IsCraftInProgress || isMenuClientCraftingInProgress)
         {
             return false;
         }
 
         return true;
+    }
+
+    private static bool IsMenuClientCraftingInProgress(uGUI_CraftingMenu menu)
+    {
+        var client = menu != null ? menu.client : null;
+        if (client == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var craftingField = AccessTools.Field(client.GetType(), "crafting");
+            if (craftingField == null)
+            {
+                return false;
+            }
+
+            var value = craftingField.GetValue(client);
+            return value is bool isCrafting && isCrafting;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static bool TryResolveTechType(object sender, out TechType techType)
