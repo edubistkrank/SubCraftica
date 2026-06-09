@@ -36,7 +36,6 @@ public sealed class Plugin : BaseUnityPlugin
     {
         Log = Logger;
         SubCrafticaLogger.Initialize();
-        PrototypeCompatDebugLogger.Initialize();
 
         var config = ModConfig.Bind(Config);
         Services = new ModServices(config);
@@ -187,7 +186,6 @@ public sealed class Plugin : BaseUnityPlugin
     private void OnDestroy()
     {
         harmony?.UnpatchSelf();
-        PrototypeCompatDebugLogger.Dispose();
         SubCrafticaLogger.Dispose();
     }
 }

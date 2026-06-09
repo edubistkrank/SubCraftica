@@ -1,6 +1,5 @@
 using HarmonyLib;
 using SubCraftica.Services.Crafting;
-using SubCraftica.Services.Logging;
 
 namespace SubCraftica.Patches;
 
@@ -25,31 +24,14 @@ internal static class uGUICraftingMenuActionPatch
             return true;
         }
 
-        var prototypeCompat = Plugin.Services.PrototypeSubCompat;
-        var isPrototypeClient = prototypeCompat != null && prototypeCompat.IsPrototypeCrafterClientActive();
-        if (isPrototypeClient)
-        {
-            var clientType = __instance?.client?.GetType().FullName ?? "null";
-            PrototypeCompatDebugLogger.Info($"Menu.Action request techType={techType} clientType={clientType}");
-        }
-
         var defabCompat = Plugin.Services.DefabricatorCompat;
         var isDefabRecycle = defabCompat != null && defabCompat.IsDefabricationActiveFor(techType);
 
         if (!Plugin.Services.Config.CreativeMode.Value && !isDefabRecycle)
         {
             var unlockState = KnownTech.GetTechUnlockState(techType);
-            if (isPrototypeClient)
-            {
-                PrototypeCompatDebugLogger.Debug($"Menu.Action unlockState={unlockState} techType={techType}");
-            }
-
             if (unlockState != TechUnlockState.Available)
             {
-                if (isPrototypeClient)
-                {
-                    PrototypeCompatDebugLogger.Warn($"Menu.Action blocked by unlockState={unlockState} techType={techType}");
-                }
                 return false;
             }
         }
@@ -59,10 +41,6 @@ internal static class uGUICraftingMenuActionPatch
 
         if (!Plugin.Services.PlannerValidation.CanPlan(techType))
         {
-            if (isPrototypeClient)
-            {
-                PrototypeCompatDebugLogger.Warn($"Menu.Action planner validation failed techType={techType}");
-            }
             return true;
         }
 
@@ -72,10 +50,6 @@ internal static class uGUICraftingMenuActionPatch
             {
                 if (!defabCompat.CanRecycleAmount(techType, request.Amount))
                 {
-                    if (isPrototypeClient)
-                    {
-                        PrototypeCompatDebugLogger.Warn($"Menu.Action defab cannot recycle amount={request.Amount} techType={techType}");
-                    }
                     ErrorMessage.AddWarning(Language.main.Get("DontHaveNeededIngredients"));
                     return false;
                 }
@@ -83,17 +57,8 @@ internal static class uGUICraftingMenuActionPatch
             else
             {
                 var plan = Plugin.Services.RecipePlanner.BuildRequestPlan(techType, request.Amount);
-                if (isPrototypeClient)
-                {
-                    PrototypeCompatDebugLogger.Debug($"Menu.Action BuildRequestPlan success={plan.Success} amount={request.Amount} techType={techType}");
-                }
-
                 if (!plan.Success)
                 {
-                    if (isPrototypeClient)
-                    {
-                        PrototypeCompatDebugLogger.Warn($"Menu.Action blocked by missing ingredients amount={request.Amount} techType={techType}");
-                    }
                     ErrorMessage.AddWarning(Language.main.Get("DontHaveNeededIngredients"));
                     return false;
                 }
@@ -103,17 +68,8 @@ internal static class uGUICraftingMenuActionPatch
         var queued = Plugin.Services.Queue.TryEnqueue(request, Plugin.Services.Config.MaxQueueSize.Value);
         if (!queued)
         {
-            if (isPrototypeClient)
-            {
-                PrototypeCompatDebugLogger.Warn($"Menu.Action queue full amount={request.Amount} techType={techType} queueCount={Plugin.Services.Queue.Count}");
-            }
             Plugin.Services.QueueFeedback.NotifyQueueFull(Plugin.Services.Config.MaxQueueSize.Value);
             return false;
-        }
-
-        if (isPrototypeClient)
-        {
-            PrototypeCompatDebugLogger.Info($"Menu.Action queued amount={request.Amount} totalAmount={request.TotalAmount} techType={techType} queueCount={Plugin.Services.Queue.Count}");
         }
 
         // Clear focus so the next hover on this item starts at x1
@@ -130,16 +86,7 @@ internal static class uGUICraftingMenuActionPatch
 
         if (Plugin.Services.Synchronization.IsCraftInProgress || isMenuClientCraftingInProgress)
         {
-            if (isPrototypeClient)
-            {
-                PrototypeCompatDebugLogger.Debug($"Menu.Action deferred immediate craft syncInProgress={Plugin.Services.Synchronization.IsCraftInProgress} menuCrafting={isMenuClientCraftingInProgress}");
-            }
             return false;
-        }
-
-        if (isPrototypeClient)
-        {
-            PrototypeCompatDebugLogger.Debug("Menu.Action allowing immediate craft start");
         }
 
         return true;
@@ -238,3 +185,4 @@ internal static class uGUICraftingMenuSetLockedPatch
         locked = false;
     }
 }
+

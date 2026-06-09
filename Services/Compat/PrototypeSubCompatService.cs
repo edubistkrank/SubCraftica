@@ -3,7 +3,6 @@ using BepInEx.Bootstrap;
 using HarmonyLib;
 using SubCraftica.Services.Composition;
 using SubCraftica.Services.Configuration;
-using SubCraftica.Services.Logging;
 
 namespace SubCraftica.Services.Compat;
 
@@ -19,7 +18,6 @@ internal sealed class PrototypeSubCompatService
     {
         if (!IsInstalled || client == null)
         {
-            PrototypeCompatDebugLogger.Debug($"IsPrototypeFabricator => false (installed={IsInstalled}, clientNull={client == null})");
             return false;
         }
 
@@ -27,12 +25,10 @@ internal sealed class PrototypeSubCompatService
         var fullName = type.FullName;
         if (!string.IsNullOrEmpty(fullName) && fullName == AlienFabricatorTypeFullName)
         {
-            PrototypeCompatDebugLogger.Debug($"IsPrototypeFabricator => true (fullName={fullName})");
             return true;
         }
 
         var fallbackMatch = type.Name == "AlienFabricator" && type.Namespace == "PrototypeSubMod.Prefabs";
-        PrototypeCompatDebugLogger.Debug($"IsPrototypeFabricator fallback => {fallbackMatch} (name={type.Name}, ns={type.Namespace ?? "null"})");
         return fallbackMatch;
     }
 
@@ -72,7 +68,6 @@ internal sealed class PrototypeSubCompatService
     {
         if (!IsPrototypeFabricator(fabricator))
         {
-            PrototypeCompatDebugLogger.Debug("IsAlienFabricatorCrafting => false (not prototype fabricator)");
             return false;
         }
 
@@ -81,18 +76,15 @@ internal sealed class PrototypeSubCompatService
             var craftingField = AccessTools.Field(fabricator.GetType(), AlienFabricatorCraftingFieldName);
             if (craftingField == null)
             {
-                PrototypeCompatDebugLogger.Warn("IsAlienFabricatorCrafting => false (crafting field not found)");
                 return false;
             }
 
             var value = craftingField.GetValue(fabricator);
             var isCrafting = value is bool b && b;
-            PrototypeCompatDebugLogger.Debug($"IsAlienFabricatorCrafting => {isCrafting}");
             return isCrafting;
         }
-        catch (Exception ex)
+        catch
         {
-            PrototypeCompatDebugLogger.Error(ex, "IsAlienFabricatorCrafting failed");
             return false;
         }
     }
@@ -121,17 +113,13 @@ internal sealed class PrototypeSubCompatService
     {
         if (services == null || !ShouldDeferCraftCleanup(crafter, services.Config.CraftingMode.Value))
         {
-            PrototypeCompatDebugLogger.Debug("TryCleanupAfterCraftingEnd skipped");
             return;
         }
 
         if (!services.Runtime.TryGetLastTechType(out var lastTechType))
         {
-            PrototypeCompatDebugLogger.Warn("TryCleanupAfterCraftingEnd skipped (no last tech type)");
             return;
         }
-
-        PrototypeCompatDebugLogger.Info($"TryCleanupAfterCraftingEnd restoring state for {lastTechType}");
 
         services.RecipeOverride.Restore(lastTechType);
         services.Runtime.Clear(lastTechType);
