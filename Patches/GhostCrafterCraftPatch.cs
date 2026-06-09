@@ -32,6 +32,12 @@ internal static class GhostCrafterCraftPatch
             return true;
         }
 
+        var isPrototypeInstance = Services.PrototypeSubCompat != null && Services.PrototypeSubCompat.IsPrototypeFabricator(__instance);
+        if (isPrototypeInstance)
+        {
+            PrototypeCompatDebugLogger.Debug($"MainCraft.Prefix enter techType={techType} mode={Services.Config.CraftingMode.Value} queueCount={Services.Queue.Count}");
+        }
+
         if (Services.PrototypeSubCompat != null
             && Services.PrototypeSubCompat.ShouldBypassMainCraftPrefix(__instance, Services.Config.CraftingMode.Value))
         {
@@ -41,6 +47,10 @@ internal static class GhostCrafterCraftPatch
 
         if (!Services.Synchronization.TryEnterCraft())
         {
+            if (isPrototypeInstance)
+            {
+                PrototypeCompatDebugLogger.Warn("MainCraft.Prefix blocked by Synchronization.TryEnterCraft=false");
+            }
             SubCrafticaLogger.LogDebug("[GhostCrafterCraftPatch.Prefix] Synchronization failed - craft already running");
             ErrorMessage.AddWarning(ModText.Get(ModText.CraftAlreadyRunning));
             return false;
@@ -52,6 +62,10 @@ internal static class GhostCrafterCraftPatch
 
         if (!Services.Queue.TryDequeueForTechType(techType, out var request))
         {
+            if (isPrototypeInstance)
+            {
+                PrototypeCompatDebugLogger.Warn($"MainCraft.Prefix no dequeue match for techType={techType}, queueCount={Services.Queue.Count}");
+            }
             // No queued request: vanilla single craft, just track energy
             SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] No queued request - vanilla single craft");
             Services.CraftRuntimeState.SetRequiredEnergy(techType, Services.Energy.GetRequiredEnergy(techType, 1));
@@ -60,6 +74,10 @@ internal static class GhostCrafterCraftPatch
         }
 
         SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Dequeued request: amount={request.Amount}, totalAmount={request.TotalAmount}");
+        if (isPrototypeInstance)
+        {
+            PrototypeCompatDebugLogger.Info($"MainCraft.Prefix dequeued amount={request.Amount} totalAmount={request.TotalAmount} techType={techType}");
+        }
         var craftingMode = Services.Config.CraftingMode.Value;
 
         var usePerItemFlow = craftingMode == ModConfig.CraftingModePerItem;
@@ -67,6 +85,11 @@ internal static class GhostCrafterCraftPatch
         var result = usePerItemFlow
             ? HandlePerItemCraft(__instance, techType, request)
             : HandleBatchOrInstantCraft(__instance, techType, request, craftingMode);
+
+        if (isPrototypeInstance)
+        {
+            PrototypeCompatDebugLogger.Debug($"MainCraft.Prefix result={result} techType={techType}");
+        }
 
         SubCrafticaLogger.LogDebug($"[GhostCrafterCraftPatch.Prefix] Craft handling returned {result}");
         return result;
@@ -141,6 +164,11 @@ internal static class GhostCrafterCraftPatch
         var requestedAmount = request.Amount;
         var requestTotalAmount = request.TotalAmount;
         var powerRelay = Traverse.Create(instance).Field<PowerRelay>("powerRelay").Value;
+        var isPrototypeInstance = Services.PrototypeSubCompat != null && Services.PrototypeSubCompat.IsPrototypeFabricator(instance);
+        if (isPrototypeInstance)
+        {
+            PrototypeCompatDebugLogger.Debug($"HandleBatchOrInstant start mode={craftingMode} techType={techType} requestedAmount={requestedAmount} queueCount={Services.Queue.Count}");
+        }
 
         var isDefabRecycle = Services.DefabricatorCompat != null
                              && Services.DefabricatorCompat.IsDefabricationActiveFor(techType);
@@ -149,6 +177,10 @@ internal static class GhostCrafterCraftPatch
         {
             if (!Services.DefabricatorCompat.CanRecycleAmount(techType, requestedAmount))
             {
+                if (isPrototypeInstance)
+                {
+                    PrototypeCompatDebugLogger.Warn("HandleBatchOrInstant defab cannot recycle requested amount");
+                }
                 HandleMissingIngredientsFailure(techType, craftingMode);
                 return false;
             }
@@ -157,6 +189,10 @@ internal static class GhostCrafterCraftPatch
             var recycleEnergy = Services.Energy.GetRequiredEnergy(techType, requestedAmount);
             if (!Services.Energy.HasEnoughEnergy(powerRelay, techType, recycleEnergy))
             {
+                if (isPrototypeInstance)
+                {
+                    PrototypeCompatDebugLogger.Warn($"HandleBatchOrInstant defab not enough energy recycleEnergy={recycleEnergy}");
+                }
                 HandleNotEnoughPowerFailure(techType, craftingMode);
                 return false;
             }
@@ -167,6 +203,10 @@ internal static class GhostCrafterCraftPatch
             }
 
             Services.CraftRuntimeState.SetRequiredEnergy(techType, recycleEnergy);
+            if (isPrototypeInstance)
+            {
+                PrototypeCompatDebugLogger.Debug($"HandleBatchOrInstant defab success recycleEnergy={recycleEnergy}");
+            }
             return true;
         }
 
@@ -184,6 +224,11 @@ internal static class GhostCrafterCraftPatch
             }
 
             plan = Services.RecipePlanner.BuildPlan(techType, craftAmount);
+            if (isPrototypeInstance)
+            {
+                PrototypeCompatDebugLogger.Debug($"HandleBatchOrInstant plan attempt craftAmount={craftAmount} success={plan.Success}");
+            }
+
             if (!plan.Success)
             {
                 failedOnIngredients = true;
@@ -191,6 +236,10 @@ internal static class GhostCrafterCraftPatch
             }
 
             requiredEnergy = Services.Energy.GetRequiredEnergy(techType, plan.Crafted);
+            if (isPrototypeInstance)
+            {
+                PrototypeCompatDebugLogger.Debug($"HandleBatchOrInstant energy check requiredEnergy={requiredEnergy} craftedCount={plan.Crafted.Count}");
+            }
             if (Services.Energy.HasEnoughEnergy(powerRelay, techType, requiredEnergy))
             {
                 break;
@@ -201,6 +250,10 @@ internal static class GhostCrafterCraftPatch
 
         if (craftAmount <= 0 || (!Services.Config.CreativeMode.Value && (plan == null || !plan.Success)))
         {
+            if (isPrototypeInstance)
+            {
+                PrototypeCompatDebugLogger.Warn($"HandleBatchOrInstant failure craftAmount={craftAmount} failedOnIngredients={failedOnIngredients}");
+            }
             if (failedOnIngredients)
             {
                 HandleMissingIngredientsFailure(techType, craftingMode);
@@ -219,6 +272,10 @@ internal static class GhostCrafterCraftPatch
             ErrorMessage.AddWarning(ModText.Get(ModText.WarningNotEnoughPower));
             var remainder = requestedAmount - craftAmount;
             Services.Queue.TryEnqueueFront(new CraftingRequest(techType, remainder, requestTotalAmount), Services.Config.MaxQueueSize.Value);
+            if (isPrototypeInstance)
+            {
+                PrototypeCompatDebugLogger.Warn($"HandleBatchOrInstant partial craft craftAmount={craftAmount} requested={requestedAmount} remainder={remainder}");
+            }
         }
 
         // Mark queue-completed notification if this is the last item in queue
@@ -229,6 +286,10 @@ internal static class GhostCrafterCraftPatch
 
         Services.RecipeOverride.ApplyAmountOverride(techType, craftAmount);
         Services.CraftRuntimeState.SetRequiredEnergy(techType, requiredEnergy);
+        if (isPrototypeInstance)
+        {
+            PrototypeCompatDebugLogger.Info($"HandleBatchOrInstant success techType={techType} craftAmount={craftAmount} requiredEnergy={requiredEnergy}");
+        }
         return true;
     }
 

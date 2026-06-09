@@ -110,6 +110,14 @@ internal static class GhostCrafterCraftingEndPatch
 
         Plugin.Services.PrototypeSubCompat?.TryCleanupAfterCraftingEnd(__instance, Plugin.Services);
 
+        if (craftingMode == ModConfig.CraftingModePerItem
+            && Plugin.Services.PrototypeSubCompat != null
+            && Plugin.Services.PrototypeSubCompat.IsPrototypeFabricator(__instance))
+        {
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] Prototype per-item client detected, continuation delegated to compat patch");
+            return;
+        }
+
         if (craftingMode != ModConfig.CraftingModePerItem)
         {
             SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] Not per-item mode, skipping queue continuation");
