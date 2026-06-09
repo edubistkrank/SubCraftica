@@ -84,6 +84,11 @@ internal static class InventoryDestroyItemPatch
             return true;
         }
 
+        if (CraftingMenuClientHelper.IsConstructorClientActive())
+        {
+            return true;
+        }
+
         return Plugin.Services != null && Plugin.Services.Synchronization.IsCraftInProgress;
     }
 
