@@ -97,14 +97,22 @@ internal static class GhostCrafterCraftingEndPatch
         var logic = Traverse.Create(__instance).Field<CrafterLogic>("logic").Value;
         if (logic != null)
         {
-            var recipe = Traverse.Create(logic).Field<object>("recipe").Value;
-            SubCrafticaLogger.LogDebug($"[GhostCrafterCraftingEndPatch.Postfix] Logic exists, recipe={recipe}");
-            SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] Calling logic.TryPickup()");
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] Logic exists, calling logic.TryPickup()");
             logic.TryPickup();
         }
         else
         {
-            SubCrafticaLogger.LogWarning("[GhostCrafterCraftingEndPatch.Postfix] Logic is null!");
+            SubCrafticaLogger.LogWarning("[GhostCrafterCraftingEndPatch.Postfix] Logic is null - might be custom fabricator (AlienFabricator?)");
+        }
+
+        // Check if this is a custom fabricator that doesn't support per-item queuing
+        var instanceType = __instance?.GetType().FullName ?? "unknown";
+        var isAlienFabricator = instanceType.Contains("AlienFabricator");
+
+        if (isAlienFabricator)
+        {
+            SubCrafticaLogger.LogDebug("[GhostCrafterCraftingEndPatch.Postfix] AlienFabricator detected - skipping per-item queue continuation");
+            return;
         }
 
         var craftingMode = Plugin.Services.Config.CraftingMode.Value;

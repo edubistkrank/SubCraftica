@@ -54,6 +54,10 @@ internal static class PrototypeSubGhostCrafterCraftCompatPatch
             if (result is bool allowOriginal)
             {
                 SubCrafticaLogger.LogDebug($"[PrototypeSubCompat.Prefix] GhostCrafterCraftPatch.Prefix returned {allowOriginal}");
+                if (!allowOriginal)
+                {
+                    SubCrafticaLogger.LogDebug("[PrototypeSubCompat.Prefix] Queue/Batch logic blocked craft, suppressing AlienFabricator.Craft");
+                }
                 return allowOriginal;
             }
 
