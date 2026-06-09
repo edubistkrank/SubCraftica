@@ -186,5 +186,6 @@ public sealed class Plugin : BaseUnityPlugin
     private void OnDestroy()
     {
         harmony?.UnpatchSelf();
+        SubCrafticaLogger.Dispose();
     }
 }

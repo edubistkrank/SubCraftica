@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Localization;
+using SubCraftica.Services.Logging;
 using SubCraftica.Services.UI;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ internal static class InventoryDestroyItemPatch
     private static bool autoCraftConsumeInProgress;
     private static float lastConstructWarningTime;
     private static readonly Dictionary<TechType, int> constructBufferedOutputs = new Dictionary<TechType, int>();
+    private static int consumeResourcesContextDepth;
 
     [HarmonyPostfix]
     private static void Postfix(Inventory __instance, TechType destroyTechType, ref bool __result)
@@ -84,7 +86,17 @@ internal static class InventoryDestroyItemPatch
             return true;
         }
 
+        if (consumeResourcesContextDepth > 0)
+        {
+            return true;
+        }
+
         if (CraftingMenuClientHelper.IsConstructorClientActive())
+        {
+            return true;
+        }
+
+        if (Plugin.Services?.PrototypeSubCompat != null && Plugin.Services.PrototypeSubCompat.IsPrototypeCrafterClientActive())
         {
             return true;
         }
@@ -311,5 +323,26 @@ internal static class InventoryDestroyItemPatch
         }
 
         dictionary[techType] = value;
+    }
+
+    [HarmonyPatch(typeof(CrafterLogic), nameof(CrafterLogic.ConsumeResources))]
+    private static class CrafterLogicConsumeResourcesContextPatch
+    {
+        [HarmonyPrefix]
+        private static void Prefix()
+        {
+            consumeResourcesContextDepth++;
+        }
+
+        [HarmonyFinalizer]
+        private static global::System.Exception Finalizer(global::System.Exception __exception)
+        {
+            if (consumeResourcesContextDepth > 0)
+            {
+                consumeResourcesContextDepth--;
+            }
+
+            return __exception;
+        }
     }
 }

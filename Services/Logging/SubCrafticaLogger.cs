@@ -43,8 +43,13 @@ internal static class SubCrafticaLogger
                     Directory.CreateDirectory(logDir);
                 }
 
-                logFileWriter = new StreamWriter(logPath, append: true) { AutoFlush = true };
+                logFileWriter?.Dispose();
+
+                // Start a fresh session log on each game launch to avoid stale traces
+                // from previous runs being mistaken for current issues.
+                logFileWriter = new StreamWriter(logPath, append: false) { AutoFlush = true };
                 LogInfo("=== SubCraftica Debug Log Initialized ===");
+                LogInfo($"Session started: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
                 LogInfo($"Log file location: {logPath}");
             }
         }
@@ -103,8 +108,19 @@ internal static class SubCrafticaLogger
     {
         lock (logLock)
         {
-            logFileWriter?.Dispose();
-            logFileWriter = null;
+            if (logFileWriter != null)
+            {
+                try
+                {
+                    logFileWriter.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] [Info] === SubCraftica Debug Log Closed ===");
+                }
+                catch
+                {
+                }
+
+                logFileWriter.Dispose();
+                logFileWriter = null;
+            }
         }
     }
 }

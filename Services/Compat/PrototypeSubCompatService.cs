@@ -29,6 +29,21 @@ internal sealed class PrototypeSubCompatService
         return type.Name == "AlienFabricator" && type.Namespace == "PrototypeSubMod.Prefabs";
     }
 
+    public bool IsPrototypeCrafterClient(object client)
+    {
+        if (!IsInstalled || client == null)
+        {
+            return false;
+        }
+
+        if (IsPrototypeFabricator(client))
+        {
+            return true;
+        }
+
+        return client is Crafter && client.GetType().Namespace != null && client.GetType().Namespace.StartsWith("PrototypeSubMod", StringComparison.Ordinal);
+    }
+
     public bool IsPrototypeFabricator(GhostCrafter crafter)
     {
         return IsPrototypeFabricator(crafter as object);
@@ -38,6 +53,12 @@ internal sealed class PrototypeSubCompatService
     {
         var menu = uGUI.main != null ? uGUI.main.craftingMenu : null;
         return IsPrototypeFabricator(menu != null ? menu.client : null);
+    }
+
+    public bool IsPrototypeCrafterClientActive()
+    {
+        var menu = uGUI.main != null ? uGUI.main.craftingMenu : null;
+        return IsPrototypeCrafterClient(menu != null ? menu.client : null);
     }
 
     public bool IsAlienFabricatorCrafting(object fabricator)

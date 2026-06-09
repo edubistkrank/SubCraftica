@@ -94,6 +94,15 @@ internal sealed class QuantitySelectionService
         }
     }
 
+    public void ResetAllFocus()
+    {
+        focusedTechType = TechType.None;
+        focusedAmount = 1;
+        nextControllerAdjustAt = 0f;
+        wasCraftSessionActive = false;
+        sessionInactiveSince = -1f;
+    }
+
     private void SyncSessionState(bool sessionActive)
     {
         if (sessionActive)
