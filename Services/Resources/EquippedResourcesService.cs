@@ -1,4 +1,3 @@
-using System.Reflection;
 using UnityEngine;
 
 namespace SubCraftica.Services.Resources;
@@ -9,9 +8,6 @@ namespace SubCraftica.Services.Resources;
 /// </summary>
 internal sealed class EquippedResourcesService
 {
-    private static MethodInfo _equipmentDestroyItemMethod;
-    private static MethodInfo _equipmentGetCountMethod;
-
     /// <summary>
     /// Attempts to consume an item from player's equipped equipment.
     /// </summary>
@@ -31,18 +27,19 @@ internal sealed class EquippedResourcesService
             return false;
         }
 
-        var remaining = amount;
-        while (remaining > 0)
+        var consumed = 0;
+
+        while (consumed < amount)
         {
-            if (!DestroyItemFromEquipment(equipment, techType))
+            if (!TryConsumeSingleFromEquipment(equipment, techType))
             {
                 break;
             }
 
-            remaining--;
+            consumed++;
         }
 
-        return remaining < amount; // Return true if we consumed at least 1
+        return consumed > 0;
     }
 
     /// <summary>
@@ -58,7 +55,7 @@ internal sealed class EquippedResourcesService
             return false;
         }
 
-        return GetEquipmentCount(equipment, techType) > 0;
+        return equipment.GetCount(techType) > 0;
     }
 
     /// <summary>
@@ -75,74 +72,40 @@ internal sealed class EquippedResourcesService
             return 0;
         }
 
-        return GetEquipmentCount(equipment, techType);
+        return equipment.GetCount(techType);
     }
 
     private static Equipment GetPlayerEquipment()
     {
-        var player = Player.main;
-        if (player == null)
-        {
-            return null;
-        }
-
-        var equipment = player.GetComponent<Equipment>();
-        return equipment;
+        return Inventory.main != null ? Inventory.main.equipment : null;
     }
 
-    private static bool DestroyItemFromEquipment(Equipment equipment, TechType techType)
+    private static bool TryConsumeSingleFromEquipment(Equipment equipment, TechType techType)
     {
-        try
+        foreach (EquipmentType equipmentType in System.Enum.GetValues(typeof(EquipmentType)))
         {
-            if (_equipmentDestroyItemMethod == null)
+            var slots = new System.Collections.Generic.List<string>();
+            equipment.GetSlots(equipmentType, slots);
+
+            for (var i = 0; i < slots.Count; i++)
             {
-                _equipmentDestroyItemMethod = equipment.GetType().GetMethod(
-                    "DestroyItem",
-                    BindingFlags.Public | BindingFlags.Instance,
-                    null,
-                    new[] { typeof(TechType) },
-                    null);
+                var slot = slots[i];
+                if (equipment.GetTechTypeInSlot(slot) != techType)
+                {
+                    continue;
+                }
+
+                var removed = equipment.RemoveItem(slot, true, false);
+                if (removed?.item == null)
+                {
+                    return false;
+                }
+
+                Object.Destroy(removed.item.gameObject);
+                return true;
             }
-
-            if (_equipmentDestroyItemMethod == null)
-            {
-                return false;
-            }
-
-            var result = _equipmentDestroyItemMethod.Invoke(equipment, new object[] { techType });
-            return result is bool success && success;
         }
-        catch
-        {
-            return false;
-        }
-    }
 
-    private static int GetEquipmentCount(Equipment equipment, TechType techType)
-    {
-        try
-        {
-            if (_equipmentGetCountMethod == null)
-            {
-                _equipmentGetCountMethod = equipment.GetType().GetMethod(
-                    "GetCount",
-                    BindingFlags.Public | BindingFlags.Instance,
-                    null,
-                    new[] { typeof(TechType) },
-                    null);
-            }
-
-            if (_equipmentGetCountMethod == null)
-            {
-                return 0;
-            }
-
-            var result = _equipmentGetCountMethod.Invoke(equipment, new object[] { techType });
-            return result is int count ? count : 0;
-        }
-        catch
-        {
-            return 0;
-        }
+        return false;
     }
 }
