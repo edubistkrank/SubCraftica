@@ -24,6 +24,7 @@ internal sealed class ModServices
         InferiusQoLCompat = new InferiusQoLCompatService();
         StackingCount = new StackingCountService(StackingDetection);
         NearbyStorage = new NearbyStorageService(config, StackingCount);
+        EquippedResources = new EquippedResourcesService();
         StorageExtractionExclusions = new StorageExtractionExclusionService(config);
         StoragePreferredSurplus = new StoragePreferredSurplusService(config);
         PlannerValidation = new PlannerValidationService();
@@ -50,6 +51,7 @@ internal sealed class ModServices
     public InferiusQoLCompatService InferiusQoLCompat { get; }
     public StackingCountService StackingCount { get; }
     public NearbyStorageService NearbyStorage { get; }
+    public EquippedResourcesService EquippedResources { get; }
     public StorageExtractionExclusionService StorageExtractionExclusions { get; }
     public StoragePreferredSurplusService StoragePreferredSurplus { get; }
     public PlannerValidationService PlannerValidation { get; }

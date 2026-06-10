@@ -55,6 +55,12 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
+        if (Plugin.Services.EquippedResources.TryConsumeFromEquipment(destroyTechType, 1))
+        {
+            __result = true;
+            return;
+        }
+
         if (autoCraftConsumeInProgress || !IsCraftOrConstructContextActive())
         {
             return;
