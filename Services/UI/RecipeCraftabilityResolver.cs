@@ -82,6 +82,12 @@ internal static class RecipeCraftabilityResolver
             value = playerContainer.GetCount(techType);
         }
 
+        // Also include equipped items
+        if (Plugin.Services?.EquippedResources != null)
+        {
+            value += Plugin.Services.EquippedResources.GetEquippedCount(techType);
+        }
+
         if (_sessionPlayerContainer == playerContainer)
         {
             SessionPlayerCountCache[techType] = value;
