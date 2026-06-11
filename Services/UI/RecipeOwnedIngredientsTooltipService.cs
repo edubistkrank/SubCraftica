@@ -28,6 +28,7 @@ internal static class RecipeOwnedIngredientsTooltipService
     private const float NestedLayoutSpacing = 1f;
     private const float BasicColumnSpacing = 2f;
     private const float BasicRowSpacing = 2f;
+    private const float ChildPanelCollisionGap = 2f;
     private const float VanillaMarginX = 10f;
     private const float BackgroundCornerScale = 1f;
     private const int MaxNestedDepth = 4;
@@ -594,6 +595,7 @@ internal static class RecipeOwnedIngredientsTooltipService
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
 
+        var childPanels = new List<RectTransform>();
         for (var i = 0; i < nodes.Count; i++)
         {
             var icon = createdIcons[i];
@@ -607,8 +609,11 @@ internal static class RecipeOwnedIngredientsTooltipService
             if (childPanel != null)
             {
                 PositionChildPanelLeftOfIcon(panelRect, icon.rectTransform, childPanel, depth);
+                childPanels.Add(childPanel);
             }
         }
+
+        ResolveSiblingChildPanelOverlaps(childPanels);
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
         var width = Mathf.Max(0f, LayoutUtility.GetPreferredWidth(contentRect)) + (panelPaddingX * 2f);
@@ -732,6 +737,7 @@ internal static class RecipeOwnedIngredientsTooltipService
             return;
         }
 
+        var leftCenterX = iconRect.anchoredPosition.x;
         var leftCenterY = iconRect.anchoredPosition.y - (iconRect.rect.height * 0.5f);
 
         childPanel.anchorMin = new Vector2(0f, 1f);
@@ -744,8 +750,103 @@ internal static class RecipeOwnedIngredientsTooltipService
             xOffset -= RootPaddingX;
         }
 
-        childPanel.anchoredPosition = new Vector2(xOffset, leftCenterY);
+        childPanel.anchoredPosition = new Vector2(leftCenterX + xOffset, leftCenterY);
         childPanel.localScale = Vector3.one;
+    }
+
+    private static void ResolveSiblingChildPanelOverlaps(List<RectTransform> childPanels)
+    {
+        if (childPanels == null || childPanels.Count <= 1)
+        {
+            return;
+        }
+
+        for (var i = 0; i < childPanels.Count; i++)
+        {
+            var current = childPanels[i];
+            if (current == null)
+            {
+                continue;
+            }
+
+            var currentPos = current.anchoredPosition;
+            var currentHeight = current.rect.height;
+            if (currentHeight <= 0f)
+            {
+                continue;
+            }
+
+            var resolvedX = currentPos.x;
+            var fixedY = currentPos.y;
+            bool adjusted;
+
+            do
+            {
+                adjusted = false;
+
+                for (var j = 0; j < i; j++)
+                {
+                    var other = childPanels[j];
+                    if (other == null)
+                    {
+                        continue;
+                    }
+
+                    if (!IntersectsInParentSpace(current, resolvedX, fixedY, other))
+                    {
+                        continue;
+                    }
+
+                    var otherLeft = other.anchoredPosition.x - other.rect.width;
+                    var candidateX = otherLeft - ChildPanelCollisionGap;
+                    if (resolvedX > candidateX)
+                    {
+                        resolvedX = candidateX;
+                        adjusted = true;
+                    }
+                }
+            }
+            while (adjusted);
+
+            if (!Mathf.Approximately(currentPos.x, resolvedX))
+            {
+                current.anchoredPosition = new Vector2(resolvedX, fixedY);
+            }
+        }
+    }
+
+    private static bool IntersectsInParentSpace(RectTransform current, float currentX, float currentY, RectTransform other)
+    {
+        var currentWidth = current.rect.width;
+        var currentHeight = current.rect.height;
+        var otherWidth = other.rect.width;
+        var otherHeight = other.rect.height;
+
+        if (currentWidth <= 0f || currentHeight <= 0f || otherWidth <= 0f || otherHeight <= 0f)
+        {
+            return false;
+        }
+
+        var currentLeft = currentX - currentWidth;
+        var currentRight = currentX;
+        var currentTop = currentY + (currentHeight * 0.5f);
+        var currentBottom = currentY - (currentHeight * 0.5f);
+
+        var otherX = other.anchoredPosition.x;
+        var otherY = other.anchoredPosition.y;
+        var otherLeft = otherX - otherWidth;
+        var otherRight = otherX;
+        var otherTop = otherY + (otherHeight * 0.5f);
+        var otherBottom = otherY - (otherHeight * 0.5f);
+
+        var horizontalOverlap = currentLeft < otherRight && currentRight > otherLeft;
+        if (!horizontalOverlap)
+        {
+            return false;
+        }
+
+        var verticalOverlap = currentBottom < otherTop && currentTop > otherBottom;
+        return verticalOverlap;
     }
 
     private static uGUI_TooltipIcon CreateIcon(RectTransform parent, IngredientNode node, int depth)
