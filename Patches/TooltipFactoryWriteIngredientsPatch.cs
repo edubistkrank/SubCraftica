@@ -137,6 +137,5 @@ namespace SubCraftica.Patches
 
             return false;
         }
-
     }
 }

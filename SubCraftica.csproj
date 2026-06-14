@@ -183,4 +183,7 @@
   <ItemGroup>
     <LangFiles Include="lang\*.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Patches\Diagnostics\" />
+  </ItemGroup>
 </Project>
