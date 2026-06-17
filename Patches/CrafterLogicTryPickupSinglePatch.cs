@@ -139,6 +139,11 @@ internal static class CrafterLogicTryPickupSinglePatch
         CrafterLogic.NotifyCraftEnd(go, instance.craftingTechType);
         NotifyPickup(instance, go);
 
+        if (go != null && go.activeInHierarchy)
+        {
+            UnityEngine.Object.Destroy(go);
+        }
+
         if (coordinator != null && !coordinator.StorageMoveNoticeShown)
         {
             ErrorMessage.AddWarning(ModText.Get(ModText.WarningInventoryMovedToStorage));

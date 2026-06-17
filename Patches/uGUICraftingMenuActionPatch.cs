@@ -26,6 +26,7 @@ internal static class uGUICraftingMenuActionPatch
 
         var defabCompat = Plugin.Services.DefabricatorCompat;
         var isDefabRecycle = defabCompat != null && defabCompat.IsDefabricationActiveFor(techType);
+        var requiresIngredients = GameModeUtils.RequiresIngredients();
 
         if (!Plugin.Services.Config.CreativeMode.Value && !isDefabRecycle)
         {
@@ -44,7 +45,7 @@ internal static class uGUICraftingMenuActionPatch
             return true;
         }
 
-        if (!Plugin.Services.Config.CreativeMode.Value)
+        if (!Plugin.Services.Config.CreativeMode.Value && requiresIngredients)
         {
             if (isDefabRecycle)
             {

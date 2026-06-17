@@ -14,6 +14,12 @@ internal static class CrafterLogicIsCraftRecipeFulfilledPatch
             return;
         }
 
+        if (!GameModeUtils.RequiresIngredients())
+        {
+            __result = true;
+            return;
+        }
+
         if (CreativeModeHelper.IsCreativeBypassActive(techType))
         {
             __result = true;

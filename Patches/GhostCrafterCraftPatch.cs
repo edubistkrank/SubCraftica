@@ -94,12 +94,21 @@ internal static class GhostCrafterCraftPatch
 
         var isDefabRecycle = Services.DefabricatorCompat != null
                              && Services.DefabricatorCompat.IsDefabricationActiveFor(techType);
+        var requiresIngredients = GameModeUtils.RequiresIngredients();
 
         if (Services.Config.CreativeMode.Value)
         {
             SubCrafticaLogger.LogDebug("[HandlePerItemCraft] Creative mode enabled - zero energy");
             Services.RecipeOverride.ApplyAmountOverride(techType, 1);
             Services.CraftRuntimeState.SetRequiredEnergy(techType, 0f);
+            return true;
+        }
+
+        if (!requiresIngredients)
+        {
+            var noCostEnergy = Services.Energy.GetRequiredEnergy(techType, 1);
+            Services.RecipeOverride.ApplyAmountOverride(techType, 1);
+            Services.CraftRuntimeState.SetRequiredEnergy(techType, noCostEnergy);
             return true;
         }
 
@@ -143,6 +152,46 @@ internal static class GhostCrafterCraftPatch
         var powerRelay = Traverse.Create(instance).Field<PowerRelay>("powerRelay").Value;
         var isDefabRecycle = Services.DefabricatorCompat != null
                              && Services.DefabricatorCompat.IsDefabricationActiveFor(techType);
+        var requiresIngredients = GameModeUtils.RequiresIngredients();
+
+        if (!Services.Config.CreativeMode.Value && !requiresIngredients)
+        {
+            var noCostAmount = requestedAmount;
+            var noCostEnergy = 0f;
+
+            while (noCostAmount > 0)
+            {
+                noCostEnergy = Services.Energy.GetRequiredEnergy(techType, noCostAmount);
+                if (Services.Energy.HasEnoughEnergy(powerRelay, techType, noCostEnergy))
+                {
+                    break;
+                }
+
+                noCostAmount--;
+            }
+
+            if (noCostAmount <= 0)
+            {
+                HandleNotEnoughPowerFailure(techType, craftingMode);
+                return false;
+            }
+
+            if (noCostAmount < requestedAmount)
+            {
+                ErrorMessage.AddWarning(ModText.Get(ModText.WarningNotEnoughPower));
+                var remainder = requestedAmount - noCostAmount;
+                Services.Queue.TryEnqueueFront(new CraftingRequest(techType, remainder, requestTotalAmount), Services.Config.MaxQueueSize.Value);
+            }
+
+            if (Services.Queue.Count == 0)
+            {
+                Services.QueueCoordinator.SetShouldNotifyQueueCompleted();
+            }
+
+            Services.RecipeOverride.ApplyAmountOverride(techType, noCostAmount);
+            Services.CraftRuntimeState.SetRequiredEnergy(techType, noCostEnergy);
+            return true;
+        }
 
         if (isDefabRecycle && !Services.Config.CreativeMode.Value)
         {
