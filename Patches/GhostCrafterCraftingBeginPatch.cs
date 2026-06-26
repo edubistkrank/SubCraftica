@@ -61,6 +61,7 @@ internal static class GhostCrafterCraftingEndPatch
     private static readonly MethodInfo GhostCrafterCraftMethod = AccessTools.Method(typeof(GhostCrafter), "Craft", new[] { typeof(TechType), typeof(float) });
     private static readonly MethodInfo CraftingMenuSetLockedMethod = AccessTools.Method(typeof(uGUI_CraftingMenu), "SetLocked");
     private static readonly MethodInfo CrafterHasCraftedItemMethod = AccessTools.Method(typeof(Crafter), "HasCraftedItem");
+    private static bool craftingMenuLockedByQueue;
 
     [HarmonyPrefix]
     private static void Prefix(GhostCrafter __instance)
@@ -283,6 +284,16 @@ internal static class GhostCrafterCraftingEndPatch
 
     private static void TrySetCraftingMenuLocked(GhostCrafter crafter, bool locked)
     {
+        if (locked && craftingMenuLockedByQueue)
+        {
+            return;
+        }
+
+        if (!locked && !craftingMenuLockedByQueue)
+        {
+            return;
+        }
+
         var menu = uGUI.main != null ? uGUI.main.craftingMenu : null;
         if (menu == null)
         {
@@ -297,6 +308,7 @@ internal static class GhostCrafterCraftingEndPatch
         try
         {
             CraftingMenuSetLockedMethod?.Invoke(menu, new object[] { locked });
+            craftingMenuLockedByQueue = locked;
         }
         catch (TargetInvocationException ex)
         {
