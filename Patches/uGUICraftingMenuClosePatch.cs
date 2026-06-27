@@ -37,6 +37,7 @@ internal static class uGUICraftingMenuClosePatch
 
         RecipeOwnedIngredientsTooltipService.ResetTrack();
         Plugin.Services.Quantity.ResetAllFocus();
+        uGUIPinnedRecipesUpdateIngredientsPatch.ClearPingCache();
 
         // Preserve queue on menu close. Closing UI should not cancel queued work.
         Plugin.Services.QueueCoordinator.ClearStopQueueContinuationRequested();
@@ -51,6 +52,7 @@ internal static class uGUICraftingMenuOpenPatch
     private static void Postfix()
     {
         RecipeOwnedIngredientsTooltipService.Prewarm();
+        uGUIPinnedRecipesUpdateIngredientsPatch.ClearPingCache();
 
         if (Plugin.Services == null)
         {

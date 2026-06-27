@@ -14,6 +14,8 @@ namespace SubCraftica.Patches;
 [HarmonyPatch(typeof(uGUI_RecipeEntry), nameof(uGUI_RecipeEntry.UpdateIngredients), new[] { typeof(ItemsContainer), typeof(bool) })]
 internal static class uGUIPinnedRecipesUpdateIngredientsPatch
 {
+    private static readonly Dictionary<string, int> LastTotalCounts = new Dictionary<string, int>();
+
     private static readonly FieldInfo ItemsField =
         AccessTools.Field(typeof(uGUI_RecipeEntry), "items");
 
@@ -70,13 +72,18 @@ internal static class uGUIPinnedRecipesUpdateIngredientsPatch
                 continue;
             }
 
+            var cacheKey = BuildIngredientKey(__instance, ingredient.techType);
+            LastTotalCounts.TryGetValue(cacheKey, out var previousCount);
+            var shouldPing = ping && count > previousCount;
+            LastTotalCounts[cacheKey] = count;
+
             var text = recipeItem.text;
             if (text != null)
             {
                 text.color = count >= amount ? manager.colorGreen : manager.colorRed;
             }
 
-            recipeItem.Set(ingredient.techType, count, amount, ping);
+            recipeItem.Set(ingredient.techType, count, amount, shouldPing);
         }
 
         var craftAmount = TechData.GetCraftAmount(__instance.techType);
@@ -123,5 +130,15 @@ internal static class uGUIPinnedRecipesUpdateIngredientsPatch
         var inventory = Plugin.Services.StackingCount.GetContainerCount(container, techType);
         var storage = Plugin.Services.NearbyStorage.GetNearbyCount(techType, container);
         return inventory + storage;
+    }
+
+    internal static void ClearPingCache()
+    {
+        LastTotalCounts.Clear();
+    }
+
+    private static string BuildIngredientKey(uGUI_RecipeEntry entry, TechType techType)
+    {
+        return entry.GetInstanceID().ToString() + "|" + ((int)techType).ToString();
     }
 }
