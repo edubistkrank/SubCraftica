@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Reflection;
 using HarmonyLib;
+using Nautilus.Handlers;
+using SubCraftica.Patches.Compat;
 using SubCraftica.Services.Composition;
 using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Crafting;
@@ -149,6 +151,22 @@ internal static class GhostCrafterCraftPatch
     {
         var requestedAmount = request.Amount;
         var requestTotalAmount = request.TotalAmount;
+
+        if (craftingMode == ModConfig.CraftingModeBatch && requestedAmount > 1)
+        {
+            var baseRecipe = Services.RecipeOverride.GetBaseRecipe(techType) ?? CraftDataHandler.GetRecipeData(techType);
+            if (CustomCraft3CompatPatch.UsesPerItemBatching(baseRecipe, requestedAmount))
+            {
+                var remainder = requestedAmount - 1;
+                if (remainder > 0)
+                {
+                    Services.Queue.TryEnqueueFront(new CraftingRequest(techType, remainder, requestTotalAmount), Services.Config.MaxQueueSize.Value);
+                }
+
+                requestedAmount = 1;
+            }
+        }
+
         var powerRelay = Traverse.Create(instance).Field<PowerRelay>("powerRelay").Value;
         var isDefabRecycle = Services.DefabricatorCompat != null
                              && Services.DefabricatorCompat.IsDefabricationActiveFor(techType);

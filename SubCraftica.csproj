@@ -96,7 +96,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Patches\Compat\InventoryResourceStacksCompatPatch.cs" />
+    <Compile Include="Patches\\Compat\\InventoryResourceStacksCompatPatch.cs" />
+	<Compile Include="Patches\\Compat\\CustomCraft3CompatPatch.cs" />
     <Compile Include="Patches\Compat\MadesRedoInventoryStackingCompatPatch.cs" />
     <Compile Include="Patches\Compat\PrototypeSubGhostCrafterCompatPatch.cs" />
     <Compile Include="Patches\Compat\VisibleLockerInteriorCompatPatch.cs" />
@@ -187,3 +188,4 @@
     <Folder Include="Patches\Diagnostics\" />
   </ItemGroup>
 </Project>
+

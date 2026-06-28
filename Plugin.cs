@@ -22,6 +22,7 @@ namespace SubCraftica;
 [BepInDependency("com.Complot69.virtualstack", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("com.zerotheabsolute.powersaver", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("InferiusQoL", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency(SubCraftica.Patches.Compat.CustomCraft3CompatPatch.PluginGuid, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency(SubCraftica.Patches.Compat.VisibleLockerInteriorCompatPatch.PluginGuid, BepInDependency.DependencyFlags.SoftDependency)]
 public sealed class Plugin : BaseUnityPlugin
 {
