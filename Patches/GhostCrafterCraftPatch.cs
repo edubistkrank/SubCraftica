@@ -364,7 +364,7 @@ internal static class GhostCrafterCraftPatch
         return __exception;
     }
 
-    }
+}
 
 [HarmonyPatch(typeof(GhostCrafter), "OnCraftingEnd")]
 internal static class GhostCrafterBatchInstantCompletionPatch

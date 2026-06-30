@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using HarmonyLib;
 using SubCraftica.Services.Crafting;
 
@@ -105,7 +107,7 @@ internal static class uGUICraftingMenuActionPatch
 
         try
         {
-            var craftingField = AccessTools.Field(client.GetType(), "crafting");
+            var craftingField = FindCraftingField(client.GetType());
             if (craftingField == null)
             {
                 return false;
@@ -118,6 +120,22 @@ internal static class uGUICraftingMenuActionPatch
         {
             return false;
         }
+    }
+
+    private static FieldInfo FindCraftingField(Type type)
+    {
+        while (type != null)
+        {
+            var field = type.GetField("crafting", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            if (field != null)
+            {
+                return field;
+            }
+
+            type = type.BaseType;
+        }
+
+        return null;
     }
 
     private static bool TryResolveTechType(object sender, out TechType techType)

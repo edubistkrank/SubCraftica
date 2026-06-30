@@ -140,7 +140,7 @@ internal static class InventoryDestroyItemPatch
             hasExternalDestroyItemPatchOwners = owners.Length > 0;
             return hasExternalDestroyItemPatchOwners.Value;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             hasExternalDestroyItemPatchOwners = false;
             return false;

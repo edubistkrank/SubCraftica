@@ -150,7 +150,7 @@ internal sealed class QuantitySelectionService
 
         try
         {
-            var craftingField = AccessTools.Field(client.GetType(), "crafting");
+            var craftingField = GetCraftingField(client.GetType());
             if (craftingField == null)
             {
                 return false;
@@ -163,6 +163,22 @@ internal sealed class QuantitySelectionService
         {
             return false;
         }
+    }
+
+    private static System.Reflection.FieldInfo GetCraftingField(System.Type type)
+    {
+        while (type != null)
+        {
+            var field = type.GetField("crafting", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly);
+            if (field != null)
+            {
+                return field;
+            }
+
+            type = type.BaseType;
+        }
+
+        return null;
     }
 
     private int HandleControllerAdjust(TechType techType, int amount)
