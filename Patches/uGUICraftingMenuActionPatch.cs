@@ -73,6 +73,8 @@ internal static class uGUICraftingMenuActionPatch
             return false;
         }
 
+        CraftingMenuSprintLatch.HoldForCurrentSession(Plugin.Services.Config.CraftingMode.Value != Services.Configuration.ModConfig.CraftingModeInstant);
+
         // Clear focus so the next hover on this item starts at x1
         Plugin.Services.Quantity.ResetFocus(techType);
 
@@ -178,12 +180,32 @@ internal static class uGUICraftingMenuSetLockedPatch
             return;
         }
 
-        if (!GameInput.GetButtonHeld(GameInput.Button.Sprint))
+        if (!CraftingMenuSprintLatch.IsSprintHeldVirtual())
         {
             return;
         }
 
         locked = false;
+    }
+}
+
+internal static class CraftingMenuSprintLatch
+{
+    private static bool holdSprintVirtual;
+
+    internal static void HoldForCurrentSession(bool hold)
+    {
+        holdSprintVirtual = hold;
+    }
+
+    internal static bool IsSprintHeldVirtual()
+    {
+        return holdSprintVirtual || GameInput.GetButtonHeld(GameInput.Button.Sprint);
+    }
+
+    internal static void Clear()
+    {
+        holdSprintVirtual = false;
     }
 }
 

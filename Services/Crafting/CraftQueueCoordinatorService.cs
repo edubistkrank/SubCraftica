@@ -12,6 +12,9 @@ internal sealed class CraftQueueCoordinatorService
     private int _pendingPickupOperations;
 
     public bool HasPendingPickupOperations => _pendingPickupOperations > 0;
+    public bool IsStopQueueContinuationRequested => _stopQueueContinuationRequested;
+    public bool ShouldNotifyQueueCompleted => _shouldNotifyQueueCompleted;
+    public int PendingPickupOperations => _pendingPickupOperations;
 
     // --- Queue continuation stop ---
 

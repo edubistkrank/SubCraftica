@@ -24,7 +24,7 @@ internal sealed class QueueProgressMessageService
     private float vanillaOffsetY = -1f; // cached on first use
 
     // Active craft: warm amber; pending slots: muted steel blue
-    private const string ColorActive  = "#D4A017";
+    private const string ColorActive = "#D4A017";
     private const string ColorPending = "#5B8DB8";
 
     // ── Public API ────────────────────────────────────────────────────────────

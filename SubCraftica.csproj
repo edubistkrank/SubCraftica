@@ -96,8 +96,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\uGUICraftingMenuClosePatch.cs" />
     <Compile Include="Patches\\Compat\\InventoryResourceStacksCompatPatch.cs" />
-	<Compile Include="Patches\\Compat\\CustomCraft3CompatPatch.cs" />
+    <Compile Include="Patches\\Compat\\CustomCraft3CompatPatch.cs" />
     <Compile Include="Patches\Compat\MadesRedoInventoryStackingCompatPatch.cs" />
     <Compile Include="Patches\Compat\PrototypeSubGhostCrafterCompatPatch.cs" />
     <Compile Include="Patches\Compat\VisibleLockerInteriorCompatPatch.cs" />
@@ -117,7 +118,6 @@
     <Compile Include="Patches\TooltipFactoryWriteIngredientsPatch.cs" />
     <Compile Include="Patches\uGUICraftingMenuActionPatch.cs" />
     <Compile Include="Patches\uGUIPinnedRecipesUpdateIngredientsPatch.cs" />
-    <Compile Include="Patches\uGUICraftingMenuClosePatch.cs" />
     <Compile Include="Patches\uGUIInventoryStorageExtractionTogglePatch.cs" />
     <Compile Include="Patches\uGUIInventoryStorageSurplusTogglePatch.cs" />
     <Compile Include="Patches\uGUIInventoryStorageToggleShared.cs" />
@@ -188,4 +188,3 @@
     <Folder Include="Patches\Diagnostics\" />
   </ItemGroup>
 </Project>
-

@@ -304,6 +304,7 @@ internal static class GhostCrafterCraftPatch
     /// <summary>Emitted when the recipe planner cannot fulfill ingredients mid-queue.</summary>
     private static void HandleMissingIngredientsFailure(TechType techType, int craftingMode)
     {
+        CraftingMenuSprintLatch.Clear();
         if (craftingMode == ModConfig.CraftingModePerItem)
         {
             Services.QueueCoordinator.RequestStopQueueContinuation(Services.Queue);
@@ -318,6 +319,7 @@ internal static class GhostCrafterCraftPatch
     /// <summary>Emitted when the power relay does not have enough energy to start the craft.</summary>
     private static void HandleNotEnoughPowerFailure(TechType techType, int craftingMode)
     {
+        CraftingMenuSprintLatch.Clear();
         if (craftingMode == ModConfig.CraftingModePerItem)
         {
             Services.QueueCoordinator.RequestStopQueueContinuation(Services.Queue);

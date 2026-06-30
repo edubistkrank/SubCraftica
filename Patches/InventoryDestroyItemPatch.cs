@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using SubCraftica.Services.Configuration;
 using SubCraftica.Services.Localization;
@@ -15,6 +17,9 @@ internal static class InventoryDestroyItemPatch
     private static float lastConstructWarningTime;
     private static readonly Dictionary<TechType, int> constructBufferedOutputs = new Dictionary<TechType, int>();
     private static int consumeResourcesContextDepth;
+    private static bool? hasExternalDestroyItemPatchOwners;
+    private static float nextDestroyItemPatchScanAt;
+    private static string lastExternalOwnersSummary;
 
     [HarmonyPostfix]
     private static void Postfix(Inventory __instance, TechType destroyTechType, ref bool __result)
@@ -76,6 +81,12 @@ internal static class InventoryDestroyItemPatch
             return;
         }
 
+        if (consumeResourcesContextDepth > 0 && HasExternalInventoryDestroyItemOwners())
+        {
+            Plugin.Services.QueueCoordinator.RequestStopQueueContinuation(Plugin.Services.Queue);
+            return;
+        }
+
         if (TryAutoCraftForMissingIngredient(destroyTechType))
         {
             __result = true;
@@ -83,6 +94,57 @@ internal static class InventoryDestroyItemPatch
         }
 
         TryShowConstructWarning();
+    }
+
+    private static bool HasExternalInventoryDestroyItemOwners()
+    {
+        if (Time.unscaledTime < nextDestroyItemPatchScanAt && hasExternalDestroyItemPatchOwners.HasValue)
+        {
+            return hasExternalDestroyItemPatchOwners.Value;
+        }
+
+        nextDestroyItemPatchScanAt = Time.unscaledTime + 5f;
+
+        try
+        {
+            var method = AccessTools.Method(typeof(Inventory), nameof(Inventory.DestroyItem), new[] { typeof(TechType), typeof(bool) })
+                         ?? AccessTools.Method(typeof(Inventory), nameof(Inventory.DestroyItem), new[] { typeof(TechType) });
+            if (method == null)
+            {
+                hasExternalDestroyItemPatchOwners = false;
+                return false;
+            }
+
+            var patchInfo = Harmony.GetPatchInfo(method);
+            if (patchInfo == null)
+            {
+                hasExternalDestroyItemPatchOwners = false;
+                return false;
+            }
+
+            var owners = patchInfo.Prefixes.Select(p => p.owner)
+                .Concat(patchInfo.Postfixes.Select(p => p.owner))
+                .Concat(patchInfo.Transpilers.Select(p => p.owner))
+                .Concat(patchInfo.Finalizers.Select(p => p.owner))
+                .Where(o => !string.IsNullOrWhiteSpace(o) && !string.Equals(o, PluginInfo.Guid, StringComparison.OrdinalIgnoreCase))
+                .Distinct()
+                .OrderBy(o => o)
+                .ToArray();
+
+            var summary = owners.Length == 0 ? "<none>" : string.Join(", ", owners);
+            if (!string.Equals(summary, lastExternalOwnersSummary, StringComparison.Ordinal))
+            {
+                lastExternalOwnersSummary = summary;
+            }
+
+            hasExternalDestroyItemPatchOwners = owners.Length > 0;
+            return hasExternalDestroyItemPatchOwners.Value;
+        }
+        catch (Exception ex)
+        {
+            hasExternalDestroyItemPatchOwners = false;
+            return false;
+        }
     }
 
     private static bool IsCraftOrConstructContextActive()
@@ -291,7 +353,7 @@ internal static class InventoryDestroyItemPatch
         var pickupable = gameObject.GetComponent<Pickupable>();
         if (pickupable == null)
         {
-            Object.Destroy(gameObject);
+            UnityEngine.Object.Destroy(gameObject);
             return;
         }
 

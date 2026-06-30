@@ -47,6 +47,7 @@ internal static class GhostCrafterCraftingBeginPatch
         }
 
         SubCrafticaLogger.LogWarning($"[GhostCrafterCraftingBeginPatch] Not enough energy: required={requiredEnergy}");
+        CraftingMenuSprintLatch.Clear();
         Plugin.Services.QueueCoordinator.RequestStopQueueContinuation(Plugin.Services.Queue);
 
         ErrorMessage.AddWarning(ModText.Get(ModText.WarningNotEnoughPower));
@@ -242,7 +243,7 @@ internal static class GhostCrafterCraftingEndPatch
         // Queue continues — clear the progress line of the item that just finished
         SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Continuing queue with next: {next.TechType}");
         Plugin.Services.QueueFeedback.ClearProgress(finishedTechType);
-        TrySetCraftingMenuLocked(crafter, true);
+        TrySetCraftingMenuLocked(crafter, false);
 
         var duration = 3f;
         TechData.GetCraftTime(next.TechType, out duration);
@@ -320,4 +321,4 @@ internal static class GhostCrafterCraftingEndPatch
         }
     }
 
-    }
+}
