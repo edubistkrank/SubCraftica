@@ -146,15 +146,20 @@ internal sealed class NearbyStorageService
             }
         }
 
-        if (TryAddToCandidates(preferredCandidates, pickupable))
+        if (TryAddToCandidates(preferredCandidates, pickupable, "preferred"))
         {
             return true;
         }
 
-        return TryAddToCandidates(regularCandidates, pickupable);
+        if (TryAddToCandidates(regularCandidates, pickupable, "regular"))
+        {
+            return true;
+        }
+
+        return false;
     }
 
-    private bool TryAddToCandidates(IEnumerable<ItemsContainer> candidates, Pickupable pickupable)
+    private bool TryAddToCandidates(IEnumerable<ItemsContainer> candidates, Pickupable pickupable, string bucket)
     {
         if (candidates == null || pickupable == null)
         {

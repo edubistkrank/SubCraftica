@@ -136,6 +136,11 @@ internal static class GhostCrafterCraftingEndPatch
         // because the Finalizer in GhostCrafterCraftPatch clears Runtime.lastTechType
         // before OnCraftingEnd fires.
         var finishedTechType = Plugin.Services.Runtime.ConsumeLastPerItemFinished();
+        var finishedOutput = TechData.GetCraftAmount(finishedTechType);
+        if (finishedOutput <= 0)
+        {
+            finishedOutput = 1;
+        }
         SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Consumed finished tech type: {finishedTechType}");
 
         yield return null;
@@ -247,6 +252,11 @@ internal static class GhostCrafterCraftingEndPatch
 
         var duration = 3f;
         TechData.GetCraftTime(next.TechType, out duration);
+        var nextOutput = TechData.GetCraftAmount(next.TechType);
+        if (nextOutput <= 0)
+        {
+            nextOutput = 1;
+        }
 
         SubCrafticaLogger.LogDebug($"[HandlePerItemQueueEnd] Invoking next craft: {next.TechType}, duration={duration}");
         GhostCrafterCraftMethod?.Invoke(crafter, new object[] { next.TechType, duration });

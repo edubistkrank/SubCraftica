@@ -131,19 +131,20 @@ internal static class CrafterLogicTryPickupSinglePatch
 
     private static bool TryPlaceInStorage(CrafterLogic instance, GameObject go, Pickupable pickupable, Services.Crafting.CraftQueueCoordinatorService coordinator)
     {
+        // Match container-insertion semantics used by stacking compat inventory path.
+        // This prevents world-entity side effects on items routed to storage.
+        pickupable.Pickup(false);
+
         if (!Plugin.Services.NearbyStorage.TryAddToNearbyStorage(pickupable))
         {
             return false;
         }
-
         CrafterLogic.NotifyCraftEnd(go, instance.craftingTechType);
         NotifyPickup(instance, go);
 
-        if (go != null && go.activeInHierarchy)
-        {
-            UnityEngine.Object.Destroy(go);
-        }
-
+        // IMPORTANT: Do not destroy the source GameObject after AddItem success.
+        // The stored Pickupable may still be the same object instance and destroying it
+        // can remove the item that was just inserted into storage.
         if (coordinator != null && !coordinator.StorageMoveNoticeShown)
         {
             ErrorMessage.AddWarning(ModText.Get(ModText.WarningInventoryMovedToStorage));
